@@ -1,0 +1,41 @@
+<resources>
+    <string name="app_name">InstagramApplication</string>
+    <string name="title_activity_login">Sign in</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password (optional)</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="error_invalid_email">This email address is invalid</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_field_required">This field is required</string>
+    <string name="permission_rationale">"Contacts permissions are needed for providing email
+        completions."
+    </string>
+
+    <string name="hint_email_address">Email</string>
+    <string name="hint_password">Password</string>
+    <string name="login_btn">Log In</string>
+    <string name="signup_btn">Don\'t have an account? Sign up.</string>
+    <string name="logo_for_login">Login Logo</string>
+    <string name="title_activity_login2">Sign in</string>
+    <string name="action_search_text">Search</string>
+    <string name="action_setting_text">Account Settings</string>
+    <string name="action_logout_text">Logout</string>
+    <string name="register_desc">Sign up to see photos and videos from your friends</string>
+    <string name="signin_btn">Already have an Account?</string>
+    <string name="register_btn">Sign up</string>
+    <string name="reg_pass_text">Password</string>
+    <string name="hint_reg_pass">Password</string>
+    <string name="hint_reg_conf_pass">Confirm Password</string>
+    <string name="setupimage">Setup Image</string>
+    <string name="hint_name">Name</string>
+    <string name="hint_username">Username</string>
+    <string name="hint_bio">Bio</string>
+    <string name="text_name">Name</string>
+    <string name="text_username">Username</string>
+    <string name="text_bio">Bio</string>
+    <string name="setup_btn_name">Save Account Details</string>
+</resources>
