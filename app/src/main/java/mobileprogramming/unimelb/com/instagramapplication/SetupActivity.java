@@ -140,19 +140,19 @@ public class SetupActivity extends AppCompatActivity {
                 final String username =setupUsername.getText().toString();
                 final String bio = setupBio.getText().toString();
 
-                setupProgress.setVisibility(View.VISIBLE);
-
-                if(isChanged){
-
                 if(!TextUtils.isEmpty(username) && mainImageURI != null) {
 
-                    user_id = mAuth.getCurrentUser().getUid();
+                    setupProgress.setVisibility(View.VISIBLE);
 
-                    final StorageReference image_path = storageReference.child("profile_images").child(user_id + ".jpg");
+                    if(isChanged){
 
-                    image_path.putFile(mainImageURI).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(final UploadTask.TaskSnapshot taskSnapshot) {
+                        user_id = mAuth.getCurrentUser().getUid();
+
+                        final StorageReference image_path = storageReference.child("profile_images").child(user_id + ".jpg");
+
+                        image_path.putFile(mainImageURI).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                            @Override
+                            public void onSuccess(final UploadTask.TaskSnapshot taskSnapshot) {
                             image_path.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                                 @Override
                                 public void onSuccess(Uri uri) {
@@ -163,19 +163,19 @@ public class SetupActivity extends AppCompatActivity {
 
                             });
                             setupProgress.setVisibility(View.INVISIBLE);
-                        }
-                    });
+                            }
+                        });
 
 
                     }else{
 
                         storeFirestore(null, mainImageURI, name, username, bio);
 
-                    }//end of isChanged method
+                    }//end of isChanged if statement
 
-                } //end of onclick method
+                } //end of validating username if statement
 
-            }
+            }//end of onclick method
 
 
         });
