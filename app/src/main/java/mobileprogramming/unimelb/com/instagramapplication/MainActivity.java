@@ -1,33 +1,41 @@
 package mobileprogramming.unimelb.com.instagramapplication;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import mobileprogramming.unimelb.com.instagramapplication.utils.CommonUtils;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static String username;
+    public static String name;
     private Toolbar mainToolbar;
     private FirebaseAuth mAuth;
-
     private BottomNavigationView mMainNav;
     private FrameLayout mMainFrame;
-
     private UserFeedsFragment userFeedsFragment;
     private DiscoverFragment discoverFragment;
     private PhotoFragment photoFragment;
     private ActivityFeedsFragment activityFeedsFragment;
     private ProfileFragment profileFragment;
+    private FirebaseFirestore mFirestore;
+    private String user_id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,10 +43,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mAuth = FirebaseAuth.getInstance();
+        mFirestore = FirebaseFirestore.getInstance();
         mainToolbar = findViewById(R.id.main_toolbar);
         setSupportActionBar(mainToolbar);
 
         getSupportActionBar().setTitle("Instagram");
+
 
         mMainFrame = (FrameLayout) findViewById(R.id.main_frame);
         mMainNav = (BottomNavigationView) findViewById(R.id.main_nav);
@@ -49,11 +59,31 @@ public class MainActivity extends AppCompatActivity {
         activityFeedsFragment = new ActivityFeedsFragment();
         profileFragment = new ProfileFragment();
 
-        //setting a default fragment
-        setFragment(userFeedsFragment);
-        //selecting a fragment
-        selectFragment();
 
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+
+            CommonUtils.showLoadingDialog(MainActivity.this);
+            user_id = mAuth.getCurrentUser().getUid();
+            mFirestore.collection("Users").document(user_id).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    CommonUtils.dismissProgressDialog();
+                    if (task.isSuccessful()) {
+                        //setting a default fragment
+                        setFragment(userFeedsFragment);
+                        selectFragment();
+                        if (task.getResult().exists()) {
+                            String image = task.getResult().getString("image");
+                            name = task.getResult().getString("name");
+                            username = task.getResult().getString("username");
+                            String bio = task.getResult().getString("bio");
+                        }
+
+                    }
+                }
+            });
+        }
     }
 
     private void selectFragment() {
@@ -61,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
-                switch(item.getItemId()){
+                switch (item.getItemId()) {
 
                     case R.id.nav_userfeeds:
                         mMainNav.setItemBackgroundResource(R.color.colorPrimary);
@@ -96,26 +126,13 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void setFragment(Fragment fragment){
+    private void setFragment(Fragment fragment) {
 
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.main_frame, fragment);
         fragmentTransaction.commit();
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        //Refer google docs Authentication >> Android >> Manage Users
-        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        if(currentUser == null){
-
-            sendToLogin();
-
-        }
-
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -127,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        switch(item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.action_logout_btn:
                 //logout button is clicked
                 logout();
@@ -139,8 +156,8 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(settingsIntent);
                 return true;
 
-                default:
-                    return false;
+            default:
+                return false;
         }
     }
 
