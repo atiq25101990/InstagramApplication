@@ -184,7 +184,7 @@ public class UserFeedsFragment extends Fragment {
 
         CommonUtils.showLoadingDialog(getContext());
         CollectionReference citiesRef = db.collection("post");
-        Query query = citiesRef.orderBy("date", Query.Direction.ASCENDING).orderBy("location", Query.Direction.ASCENDING).limit(100);
+        Query query = citiesRef.orderBy("date", Query.Direction.ASCENDING).orderBy("location").limit(100);
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
