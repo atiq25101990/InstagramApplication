@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
         photoFragment = new PhotoFragment();
         activityFeedsFragment = new ActivityFeedsFragment();
         profileFragment = new ProfileFragment();
-
+		//Testing commit to avoid future conflicts...
 
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser != null) {
