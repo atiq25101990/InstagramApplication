@@ -1,12 +1,12 @@
 package mobileprogramming.unimelb.com.instagramapplication.adapter;
 
-import android.media.MediaPlayer;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -20,10 +20,11 @@ import mobileprogramming.unimelb.com.instagramapplication.viewholder.LoadingHold
 
 
 public class FeedLikesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private OnItemClickListener onItemClickListener;
-    private ArrayList<ModelLikes> dataSet;
     AppCompatActivity mContext;
     int total_types;
+    private OnItemClickListener onItemClickListener;
+    private ArrayList<ModelLikes> dataSet;
+
     public FeedLikesAdapter(AppCompatActivity context, ArrayList<ModelLikes> data) {
         this.dataSet = data;
         this.mContext = context;
@@ -48,30 +49,6 @@ public class FeedLikesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
     }
 
-    public static class TextTypeViewHolder extends RecyclerView.ViewHolder {
-
-        public TextTypeViewHolder(View itemView) {
-            super(itemView);
-
-
-        }
-
-    }
-
-
-    public static class ImageTypeViewHolder extends RecyclerView.ViewHolder {
-
-        TextView txt_username;
-
-
-        public ImageTypeViewHolder(View itemView) {
-            super(itemView);
-            txt_username = itemView.findViewById(R.id.txt_username);
-        }
-
-    }
-
-
     public void addLoadingView() {
         //add loading item
         new Handler().post(new Runnable() {
@@ -89,7 +66,6 @@ public class FeedLikesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         notifyItemRemoved(dataSet.size());
     }
 
-
     @Override
     public int getItemViewType(int position) {
         if (dataSet.get(position) == null)
@@ -99,9 +75,7 @@ public class FeedLikesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
                 case 1:
                     return Model.IMAGE_TYPE;
-
                 default:
-
                     return -1;
             }
         }
@@ -132,8 +106,40 @@ public class FeedLikesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                 case Model.IMAGE_TYPE:
                     ImageTypeViewHolder imageTypeViewHolder = (ImageTypeViewHolder) holder;
                     imageTypeViewHolder.txt_username.setText(String.valueOf(object.getUsername()));
+                    if (!object.isFollwing()) {
+                        imageTypeViewHolder.btn_follow.setText("Follow");
+                    } else {
+                        imageTypeViewHolder.btn_follow.setText("Following");
+                    }
+                    imageTypeViewHolder.btn_follow.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if (object.isFollwing()) {
+                                onItemClickListener.onItemClick(listPosition, 2);
+                            } else {
+                                onItemClickListener.onItemClick(listPosition, 1);
+                            }
+                        }
+                    });
                     break;
             }
+        }
+
+    }
+    public void followed(int pos) {
+        dataSet.get(pos).setFollwing(true);
+        notifyItemChanged(pos);
+    }
+
+    public static class ImageTypeViewHolder extends RecyclerView.ViewHolder {
+
+        TextView txt_username;
+        Button btn_follow;
+
+        public ImageTypeViewHolder(View itemView) {
+            super(itemView);
+            txt_username = itemView.findViewById(R.id.txt_username);
+            btn_follow = itemView.findViewById(R.id.btn_follow);
         }
 
     }

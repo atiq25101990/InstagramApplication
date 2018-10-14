@@ -14,6 +14,15 @@ public class ModelLikes {
     private String uuid;
     private String date;
     private String text;
+    private boolean isFollwing;
+
+    public boolean isFollwing() {
+        return isFollwing;
+    }
+
+    public void setFollwing(boolean follwing) {
+        isFollwing = follwing;
+    }
 
     public String getImage() {
         return image;

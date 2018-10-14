@@ -14,6 +14,16 @@ public class Model {
     private String video;
     private String postid;
     private String uuid;
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    private String date;
     private String username;
     private String image;
     private int likes = 0;

@@ -13,22 +13,31 @@ import android.util.Log;
 import android.view.View;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.WriteBatch;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import mobileprogramming.unimelb.com.instagramapplication.adapter.FeedLikesAdapter;
+import mobileprogramming.unimelb.com.instagramapplication.listener.OnItemClickListener;
 import mobileprogramming.unimelb.com.instagramapplication.listener.OnLoadMoreListener;
 import mobileprogramming.unimelb.com.instagramapplication.listener.RecyclerViewLoadMoreScroll;
 import mobileprogramming.unimelb.com.instagramapplication.models.ModelLikes;
+import mobileprogramming.unimelb.com.instagramapplication.models.ModelUsersFollowing;
 import mobileprogramming.unimelb.com.instagramapplication.utils.CommonUtils;
 
 public class FeedLikesActivity extends AppCompatActivity {
@@ -39,6 +48,7 @@ public class FeedLikesActivity extends AppCompatActivity {
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     private FeedLikesAdapter adapter;
     private ArrayList<ModelLikes> feeds = new ArrayList<>();
+    private ArrayList<ModelUsersFollowing> usersFollowings = new ArrayList<>();
     private RecyclerViewLoadMoreScroll scrollListener;
     private FragmentManager fm;
     private String TAG = "UserFeedsFragment";
@@ -85,7 +95,73 @@ public class FeedLikesActivity extends AppCompatActivity {
             }
         });
         recyclerView.addOnScrollListener(scrollListener);
-        getUserLikes();
+        adapter.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(final int position, int in) {
+                if (in == 1) {
+                    /*
+                     * Code here to follow user
+                     */
+
+
+
+
+
+
+
+                    Map<String, Object> user = new HashMap<>();
+                    user.put("followerid", uuid);
+                    user.put("uid", feeds.get(position).getUuid());
+                    //data2.put("regions", Arrays.asList("west_coast", "socal"));
+                    //user.put("username", feeds.get(position).getUsername());
+                    db.collection("follower")
+                            .add(user)
+                            .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                @Override
+                                public void onSuccess(DocumentReference documentReference) {
+                                    adapter.followed(position);
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+
+                                }
+                            });
+                } else if (in == 2) {
+                    /*
+                     * Code here to unfollow user
+                     */
+                    feeds.get(position).setFollwing(false);
+                    adapter.notifyItemChanged(position);
+                    CollectionReference citiesRef = db.collection("follower");
+                    final Query query = citiesRef.whereEqualTo("followerid", uuid).whereEqualTo("uid", feeds.get(position).getUuid());
+                    query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                            if (task.isSuccessful()) {
+                                WriteBatch batch = query.getFirestore().batch();
+                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                    batch.delete(document.getReference());
+                                }
+                                batch.commit();
+                            } else {
+                                Log.d(TAG, "Error getting documents.", task.getException());
+                            }
+                        }
+                    });
+
+                }
+            }
+
+            @Override
+            public void onItemLongClick(int position) {
+
+            }
+        });
+        feeds.clear();
+        getFollowingUsers();
     }
 
     private void LoadMoreData() {
@@ -101,8 +177,35 @@ public class FeedLikesActivity extends AppCompatActivity {
 
     }
 
+    private void getFollowingUsers() {
+        CommonUtils.showLoadingDialog(FeedLikesActivity.this);
+        CollectionReference citiesRef = db.collection("follower");
+        Query query = citiesRef.whereEqualTo("followerid", uuid).limit(100);
+        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                CommonUtils.dismissProgressDialog();
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        if (task.isSuccessful()) {
+                            final ModelUsersFollowing m = new ModelUsersFollowing();
+
+                            m.setUuid(document.getData().get("uid").toString());
+                            m.setFollowerid(document.getData().get("followerid").toString());
+                            usersFollowings.add(m);
+
+                        }
+                    }
+                }
+                getUserLikes();
+            }
+        });
+
+
+    }
+
     private void getUserLikes() {
-        feeds.clear();
+
 
         CollectionReference citiesRef = db.collection("likes");
         Query query = citiesRef.whereEqualTo("postid", postid).limit(50);
@@ -117,6 +220,13 @@ public class FeedLikesActivity extends AppCompatActivity {
                                 m.setUuid(document.getData().get("uid").toString());
                             if (document.getData().containsKey("username"))
                                 m.setUsername(document.getData().get("username").toString());
+                            for (int i = 0; i < usersFollowings.size(); i++) {
+                                if (usersFollowings.get(i).getUuid().equals(document.getData().get("uid").toString())) {
+                                    m.setFollwing(true);
+                                    break;
+                                }
+                            }
+
                             feeds.add(m);
                             adapter.notifyDataSetChanged();
                         }

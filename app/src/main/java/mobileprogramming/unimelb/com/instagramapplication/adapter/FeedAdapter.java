@@ -15,7 +15,11 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import mobileprogramming.unimelb.com.instagramapplication.FeedCommentsActivity;
 import mobileprogramming.unimelb.com.instagramapplication.FeedLikesActivity;
@@ -27,11 +31,11 @@ import mobileprogramming.unimelb.com.instagramapplication.viewholder.LoadingHold
 
 
 public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private OnItemClickListener onItemClickListener;
-    private ArrayList<Model> dataSet;
     AppCompatActivity mContext;
     int total_types;
     MediaPlayer mPlayer;
+    private OnItemClickListener onItemClickListener;
+    private ArrayList<Model> dataSet;
     private boolean fabStateVolume = false;
 
     public FeedAdapter(AppCompatActivity context, ArrayList<Model> data) {
@@ -62,28 +66,6 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     }
 
-
-    public static class ImageTypeViewHolder extends RecyclerView.ViewHolder {
-        AppCompatImageView post_image;
-        TextView txt_likes;
-        TextView txt_username;
-        TextView txt_comments;
-        ImageView btn_like;
-        ImageButton btnOption;
-
-        public ImageTypeViewHolder(View itemView) {
-            super(itemView);
-            post_image = itemView.findViewById(R.id.post_image);
-            txt_likes = itemView.findViewById(R.id.txt_likes);
-            txt_username = itemView.findViewById(R.id.txt_username);
-            txt_comments = itemView.findViewById(R.id.txt_comments);
-            btn_like = itemView.findViewById(R.id.btn_like);
-            btnOption = itemView.findViewById(R.id.btn_option);
-        }
-
-    }
-
-
     public void addLoadingView() {
         //add loading item
         new Handler().post(new Runnable() {
@@ -100,7 +82,6 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         dataSet.remove(dataSet.size() - 1);
         notifyItemRemoved(dataSet.size());
     }
-
 
     @Override
     public int getItemViewType(int position) {
@@ -147,6 +128,18 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     ImageTypeViewHolder imageTypeViewHolder = (ImageTypeViewHolder) holder;
                     imageTypeViewHolder.txt_likes.setText(String.valueOf(object.getLikes()) + " Total likes");
                     imageTypeViewHolder.txt_username.setText(String.valueOf(object.getUsername()));
+                    SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM dd HH:mm:ss Z yyyy");
+
+                    SimpleDateFormat formatterOut = new SimpleDateFormat("HH:mm:ss dd MMM yyyy");
+                    try {
+                        Date date = formatter.parse(object.getDate());
+                        imageTypeViewHolder.txt_date.setText(formatterOut.format(date));
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+
+
+
                     imageTypeViewHolder.txt_likes.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -176,9 +169,8 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     imageTypeViewHolder.btn_like.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            object.setLikes(object.getLikes() + 1);
                             onItemClickListener.onItemClick(listPosition, 1);
-                            notifyItemChanged(listPosition);
+
                         }
                     });
                     imageTypeViewHolder.btnOption.setOnClickListener(new View.OnClickListener() {
@@ -193,5 +185,30 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     }
 
+    public void likeClicked(int pos) {
+        dataSet.get(pos).setLikes(dataSet.get(pos).getLikes() + 1);
+        notifyItemChanged(pos);
+    }
 
+    public static class ImageTypeViewHolder extends RecyclerView.ViewHolder {
+        AppCompatImageView post_image;
+        TextView txt_likes;
+        TextView txt_username;
+        TextView txt_comments;
+        TextView txt_date;
+        ImageView btn_like;
+        ImageButton btnOption;
+
+        public ImageTypeViewHolder(View itemView) {
+            super(itemView);
+            post_image = itemView.findViewById(R.id.post_image);
+            txt_likes = itemView.findViewById(R.id.txt_likes);
+            txt_date = itemView.findViewById(R.id.txt_date);
+            txt_username = itemView.findViewById(R.id.txt_username);
+            txt_comments = itemView.findViewById(R.id.txt_comments);
+            btn_like = itemView.findViewById(R.id.btn_like);
+            btnOption = itemView.findViewById(R.id.btn_option);
+        }
+
+    }
 }

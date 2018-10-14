@@ -14,11 +14,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -94,27 +92,35 @@ public class UserFeedsFragment extends Fragment {
         recyclerView.addOnScrollListener(scrollListener);
         adapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
-            public void onItemClick(int position, int in) {
+            public void onItemClick(final int position, int in) {
                 if (in == 1) {
-                    Toast.makeText(getContext(), "Liked  ", Toast.LENGTH_SHORT).show();
-                    Map<String, Object> user = new HashMap<>();
-                    user.put("postid", feeds.get(position).getPostid());
-                    user.put("uid", uuid);
-                    user.put("username", MainActivity.username);
-                    db.collection("likes")
-                            .add(user)
-                            .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                                @Override
-                                public void onSuccess(DocumentReference documentReference) {
 
+                    CollectionReference citiesRef = db.collection("likes");
+                    final Query query = citiesRef.whereEqualTo("uid", uuid).whereEqualTo("postid", feeds.get(position).getPostid());
+                    query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if (task.isSuccessful()) {
+                                if (task.getResult().isEmpty()) {
+                                    Map<String, Object> user = new HashMap<>();
+                                    user.put("postid", feeds.get(position).getPostid());
+                                    user.put("uid", uuid);
+                                    user.put("username", MainActivity.username);
+                                    db.collection("likes")
+                                            .add(user)
+                                            .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                                @Override
+                                                public void onSuccess(DocumentReference documentReference) {
+                                                    Toast.makeText(getContext(), "Liked  ", Toast.LENGTH_SHORT).show();
+                                                    adapter.likeClicked(position);
+                                                }
+                                            });
                                 }
-                            })
-                            .addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
+                            }
+                        }
+                    });
 
-                                }
-                            });
+
                 }
 
 
@@ -178,7 +184,7 @@ public class UserFeedsFragment extends Fragment {
 
         CommonUtils.showLoadingDialog(getContext());
         CollectionReference citiesRef = db.collection("post");
-        Query query = citiesRef.limit(100);
+        Query query = citiesRef.orderBy("date", Query.Direction.ASCENDING).orderBy("location", Query.Direction.ASCENDING).limit(100);
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -193,7 +199,8 @@ public class UserFeedsFragment extends Fragment {
                             m.setImage(document.getData().get("image").toString());
                             m.setUuid(document.getData().get("uid").toString());
                             m.setUsername(document.getData().get("username").toString());
-
+                            m.setDate(document.getData().get("date").toString());
+                            Log.d(TAG, document.getData().get("date").toString());
                             CollectionReference citiesRef = db.collection("likes");
                             Query query = citiesRef.whereEqualTo("postid", document.getId());
                             CommonUtils.showLoadingDialog(getContext());
