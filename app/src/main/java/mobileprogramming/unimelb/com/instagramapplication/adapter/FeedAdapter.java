@@ -19,6 +19,7 @@ import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -28,6 +29,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import mobileprogramming.unimelb.com.instagramapplication.FeedCommentsActivity;
 import mobileprogramming.unimelb.com.instagramapplication.FeedLikesActivity;
 import mobileprogramming.unimelb.com.instagramapplication.R;
@@ -172,6 +174,27 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     });
 
                     Glide.with(mContext).load(object.getImage()).into(imageTypeViewHolder.post_image);
+                    if (object.getProfilepic()==null) {
+                        FirebaseFirestore.getInstance().collection("Users").document(object.getUuid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    if (task.getResult().exists()) {
+                                        String image = task.getResult().getString("image");
+                                        dataSet.get(listPosition).setProfilepic(image);
+                                        Glide.with(mContext).load(object.getProfilepic()).into(imageTypeViewHolder.background);
+//                                        name = task.getResult().getString("name");
+//                                        username = task.getResult().getString("username");
+//                                        String bio = task.getResult().getString("bio");
+
+                                    }
+
+                                }
+                            }
+                        });
+                    } else {
+                        Glide.with(mContext).load(object.getProfilepic()).into(imageTypeViewHolder.background);
+                    }
                     imageTypeViewHolder.btn_like.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
@@ -191,10 +214,10 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                         @Override
                         public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                            Log.d("fromadpter","Done");
+                            Log.d("fromadpter", "Done");
 
                             if (task.isSuccessful()) {
-                                Log.d("fromadpter",task.toString());
+                                Log.d("fromadpter", task.toString());
                                 dataSet.get(listPosition).setLikes(task.getResult().size());
                                 imageTypeViewHolder.txt_likes.setText(String.valueOf(object.getLikes()) + " Total likes");
                             }
@@ -217,6 +240,7 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public static class ImageTypeViewHolder extends RecyclerView.ViewHolder {
         AppCompatImageView post_image;
         TextView txt_likes;
+        CircleImageView background;
         TextView txt_username;
         TextView txt_comments;
         TextView txt_date;
@@ -225,6 +249,7 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         public ImageTypeViewHolder(View itemView) {
             super(itemView);
+            background = itemView.findViewById(R.id.background);
             post_image = itemView.findViewById(R.id.post_image);
             txt_likes = itemView.findViewById(R.id.txt_likes);
             txt_date = itemView.findViewById(R.id.txt_date);

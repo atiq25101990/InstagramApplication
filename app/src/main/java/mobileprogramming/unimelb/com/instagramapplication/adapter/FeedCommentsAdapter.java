@@ -1,6 +1,7 @@
 package mobileprogramming.unimelb.com.instagramapplication.adapter;
 
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -8,8 +9,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.util.ArrayList;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import mobileprogramming.unimelb.com.instagramapplication.R;
 import mobileprogramming.unimelb.com.instagramapplication.listener.OnItemClickListener;
 import mobileprogramming.unimelb.com.instagramapplication.models.Model;
@@ -19,10 +27,11 @@ import mobileprogramming.unimelb.com.instagramapplication.viewholder.LoadingHold
 
 
 public class FeedCommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private OnItemClickListener onItemClickListener;
-    private ArrayList<ModelLikes> dataSet;
     AppCompatActivity mContext;
     int total_types;
+    private OnItemClickListener onItemClickListener;
+    private ArrayList<ModelLikes> dataSet;
+
     public FeedCommentsAdapter(AppCompatActivity context, ArrayList<ModelLikes> data) {
         this.dataSet = data;
         this.mContext = context;
@@ -47,32 +56,6 @@ public class FeedCommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     }
 
-    public static class TextTypeViewHolder extends RecyclerView.ViewHolder {
-
-        public TextTypeViewHolder(View itemView) {
-            super(itemView);
-
-
-        }
-
-    }
-
-
-    public static class ImageTypeViewHolder extends RecyclerView.ViewHolder {
-
-        TextView txt_username;
-        TextView txt_text;
-
-
-        public ImageTypeViewHolder(View itemView) {
-            super(itemView);
-            txt_username = itemView.findViewById(R.id.txt_username);
-            txt_text = itemView.findViewById(R.id.txt_text);
-        }
-
-    }
-
-
     public void addLoadingView() {
         //add loading item
         new Handler().post(new Runnable() {
@@ -89,7 +72,6 @@ public class FeedCommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         dataSet.remove(dataSet.size() - 1);
         notifyItemRemoved(dataSet.size());
     }
-
 
     @Override
     public int getItemViewType(int position) {
@@ -131,11 +113,58 @@ public class FeedCommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         if (object != null) {
             switch (object.getType()) {
                 case Model.IMAGE_TYPE:
-                    ImageTypeViewHolder imageTypeViewHolder = (ImageTypeViewHolder) holder;
+                    final ImageTypeViewHolder imageTypeViewHolder = (ImageTypeViewHolder) holder;
                     imageTypeViewHolder.txt_username.setText(String.valueOf(object.getUsername()));
                     imageTypeViewHolder.txt_text.setText(String.valueOf(object.getText()));
+                    if (object.getProfilepic() == null) {
+                        FirebaseFirestore.getInstance().collection("Users").document(object.getUuid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    if (task.getResult().exists()) {
+                                        String image = task.getResult().getString("image");
+                                        dataSet.get(listPosition).setProfilepic(image);
+                                        Glide.with(mContext).load(object.getProfilepic()).into(imageTypeViewHolder.background);
+//                                        name = task.getResult().getString("name");
+//                                        username = task.getResult().getString("username");
+//                                        String bio = task.getResult().getString("bio");
+
+                                    }
+
+                                }
+                            }
+                        });
+                    } else {
+                        Glide.with(mContext).load(object.getProfilepic()).into(imageTypeViewHolder.background);
+                    }
+
                     break;
             }
+        }
+
+    }
+
+    public static class TextTypeViewHolder extends RecyclerView.ViewHolder {
+
+        public TextTypeViewHolder(View itemView) {
+            super(itemView);
+
+
+        }
+
+    }
+
+    public static class ImageTypeViewHolder extends RecyclerView.ViewHolder {
+
+        TextView txt_username;
+        TextView txt_text;
+        CircleImageView background;
+
+        public ImageTypeViewHolder(View itemView) {
+            super(itemView);
+            txt_username = itemView.findViewById(R.id.txt_username);
+            background = itemView.findViewById(R.id.background);
+            txt_text = itemView.findViewById(R.id.txt_text);
         }
 
     }

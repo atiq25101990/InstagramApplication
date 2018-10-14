@@ -26,6 +26,16 @@ public class Model {
     private String date;
     private String username;
     private String image;
+
+    public String getProfilepic() {
+        return profilepic;
+    }
+
+    public void setProfilepic(String profilepic) {
+        this.profilepic = profilepic;
+    }
+
+    private String profilepic;
     private int likes = 0;
 
     public String getUsername() {

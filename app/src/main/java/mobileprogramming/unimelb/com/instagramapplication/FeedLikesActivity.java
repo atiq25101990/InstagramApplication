@@ -103,12 +103,6 @@ public class FeedLikesActivity extends AppCompatActivity {
                      * Code here to follow user
                      */
 
-
-
-
-
-
-
                     Map<String, Object> user = new HashMap<>();
                     user.put("followerid", uuid);
                     user.put("uid", feeds.get(position).getUuid());

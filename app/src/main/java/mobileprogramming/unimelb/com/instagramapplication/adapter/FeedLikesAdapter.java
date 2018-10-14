@@ -1,6 +1,7 @@
 package mobileprogramming.unimelb.com.instagramapplication.adapter;
 
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -9,8 +10,15 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.util.ArrayList;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import mobileprogramming.unimelb.com.instagramapplication.R;
 import mobileprogramming.unimelb.com.instagramapplication.listener.OnItemClickListener;
 import mobileprogramming.unimelb.com.instagramapplication.models.Model;
@@ -104,7 +112,7 @@ public class FeedLikesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         if (object != null) {
             switch (object.getType()) {
                 case Model.IMAGE_TYPE:
-                    ImageTypeViewHolder imageTypeViewHolder = (ImageTypeViewHolder) holder;
+                    final ImageTypeViewHolder imageTypeViewHolder = (ImageTypeViewHolder) holder;
                     imageTypeViewHolder.txt_username.setText(String.valueOf(object.getUsername()));
                     if (!object.isFollwing()) {
                         imageTypeViewHolder.btn_follow.setText("Follow");
@@ -121,6 +129,29 @@ public class FeedLikesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                             }
                         }
                     });
+
+
+                    if (object.getProfilepic()==null) {
+                        FirebaseFirestore.getInstance().collection("Users").document(object.getUuid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    if (task.getResult().exists()) {
+                                        String image = task.getResult().getString("image");
+                                        dataSet.get(listPosition).setProfilepic(image);
+                                        Glide.with(mContext).load(object.getProfilepic()).into(imageTypeViewHolder.background);
+//                                        name = task.getResult().getString("name");
+//                                        username = task.getResult().getString("username");
+//                                        String bio = task.getResult().getString("bio");
+
+                                    }
+
+                                }
+                            }
+                        });
+                    } else {
+                        Glide.with(mContext).load(object.getProfilepic()).into(imageTypeViewHolder.background);
+                    }
                     break;
             }
         }
@@ -135,10 +166,12 @@ public class FeedLikesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
         TextView txt_username;
         Button btn_follow;
+        CircleImageView background;
 
         public ImageTypeViewHolder(View itemView) {
             super(itemView);
             txt_username = itemView.findViewById(R.id.txt_username);
+            background = itemView.findViewById(R.id.background);
             btn_follow = itemView.findViewById(R.id.btn_follow);
         }
 
