@@ -3,9 +3,11 @@ package mobileprogramming.unimelb.com.instagramapplication.adapter;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,8 +16,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -125,7 +132,7 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             switch (object.getType()) {
 
                 case Model.IMAGE_TYPE:
-                    ImageTypeViewHolder imageTypeViewHolder = (ImageTypeViewHolder) holder;
+                    final ImageTypeViewHolder imageTypeViewHolder = (ImageTypeViewHolder) holder;
                     imageTypeViewHolder.txt_likes.setText(String.valueOf(object.getLikes()) + " Total likes");
                     imageTypeViewHolder.txt_username.setText(String.valueOf(object.getUsername()));
                     SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM dd HH:mm:ss Z yyyy");
@@ -137,7 +144,6 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
-
 
 
                     imageTypeViewHolder.txt_likes.setOnClickListener(new View.OnClickListener() {
@@ -179,6 +185,24 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                             onItemClickListener.onItemClick(listPosition, 2);
                         }
                     });
+
+                    CollectionReference citiesRef = FirebaseFirestore.getInstance().collection("likes");
+                    Query query = citiesRef.whereEqualTo("postid", object.getPostid());
+                    query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            Log.d("fromadpter","Done");
+
+                            if (task.isSuccessful()) {
+                                Log.d("fromadpter",task.toString());
+                                dataSet.get(listPosition).setLikes(task.getResult().size());
+                                imageTypeViewHolder.txt_likes.setText(String.valueOf(object.getLikes()) + " Total likes");
+                            }
+
+
+                        }
+                    });
+
                     break;
             }
         }

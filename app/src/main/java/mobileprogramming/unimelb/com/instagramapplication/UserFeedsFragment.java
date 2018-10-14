@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
@@ -48,7 +49,8 @@ public class UserFeedsFragment extends Fragment {
     RecyclerView recyclerView;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     Query first;
-
+    @BindView(R.id.fab_sort)
+    FloatingActionButton fab_sort;
     private FeedAdapter adapter;
     private ArrayList<Model> feeds = new ArrayList<>();
     private ArrayList<ModelUsersFollowing> usersFollowings = new ArrayList<>();
@@ -57,6 +59,7 @@ public class UserFeedsFragment extends Fragment {
     private FragmentManager fm;
     private String TAG = "UserFeedsFragment";
     private String uuid;
+    private boolean sortDESC = true;
 
     public UserFeedsFragment() {
     }
@@ -131,7 +134,16 @@ public class UserFeedsFragment extends Fragment {
 
             }
         });
-        feeds.clear();
+
+        fab_sort.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                feeds.clear();
+                sortDESC = !sortDESC;
+                getFeeds();
+            }
+        });
+
         getFollowingUsers();
 
     }
@@ -181,10 +193,14 @@ public class UserFeedsFragment extends Fragment {
     }
 
     private void getFeeds() {
-
         CommonUtils.showLoadingDialog(getContext());
         CollectionReference citiesRef = db.collection("post");
-        Query query = citiesRef.orderBy("date", Query.Direction.DESCENDING).limit(100);
+        Query query;
+        if (sortDESC) {
+            query = citiesRef.orderBy("date", Query.Direction.DESCENDING).orderBy("location").limit(100);
+        } else {
+            query = citiesRef.orderBy("date", Query.Direction.ASCENDING).orderBy("location").limit(100);
+        }
         //please make change as per requirement in future
         //Query query = citiesRef.orderBy("date", Query.Direction.DESCENDING).orderBy("location",Query.Direction.ASCENDING).limit(100);
 
@@ -204,28 +220,15 @@ public class UserFeedsFragment extends Fragment {
                             m.setUsername(document.getData().get("username").toString());
                             m.setDate(document.getData().get("date").toString());
                             Log.d(TAG, document.getData().get("date").toString());
-                            CollectionReference citiesRef = db.collection("likes");
-                            Query query = citiesRef.whereEqualTo("postid", document.getId());
-                            CommonUtils.showLoadingDialog(getContext());
-                            query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                @Override
-                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                    CommonUtils.dismissProgressDialog();
 
-                                    if (task.isSuccessful()) {
-                                        m.setLikes(task.getResult().size());
-                                    }
-                                    for (int i = 0; i < usersFollowings.size(); i++) {
-                                        if (usersFollowings.get(i).getUuid().equals(document.getData().get("uid").toString())) {
-                                            feeds.add(m);
-                                            break;
-                                        }
-                                    }
-
-                                    adapter.notifyDataSetChanged();
+                            for (int i = 0; i < usersFollowings.size(); i++) {
+                                if (usersFollowings.get(i).getUuid().equals(document.getData().get("uid").toString())) {
+                                    feeds.add(m);
+                                    break;
                                 }
-                            });
+                            }
 
+                            adapter.notifyDataSetChanged();
                         }
                     }
                 } else {
