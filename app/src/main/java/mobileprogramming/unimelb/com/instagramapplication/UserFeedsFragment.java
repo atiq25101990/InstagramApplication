@@ -143,7 +143,7 @@ public class UserFeedsFragment extends Fragment {
                 getFeeds();
             }
         });
-
+        feeds.clear();
         getFollowingUsers();
 
     }
@@ -174,7 +174,6 @@ public class UserFeedsFragment extends Fragment {
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         if (task.isSuccessful()) {
                             final ModelUsersFollowing m = new ModelUsersFollowing();
-
                             m.setUuid(document.getData().get("uid").toString());
                             m.setFollowerid(document.getData().get("followerid").toString());
                             usersFollowings.add(m);
