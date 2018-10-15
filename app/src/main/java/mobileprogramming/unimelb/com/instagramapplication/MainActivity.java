@@ -84,6 +84,26 @@ public class MainActivity extends AppCompatActivity {
 
                         } else {
                             Toast.makeText(MainActivity.this, "Something went wrong ! please try again !!", Toast.LENGTH_SHORT).show();
+		//Testing commit to avoid future conflicts...
+
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+
+            CommonUtils.showLoadingDialog(MainActivity.this);
+            user_id = mAuth.getCurrentUser().getUid();
+            mFirestore.collection("Users").document(user_id).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    CommonUtils.dismissProgressDialog();
+                    if (task.isSuccessful()) {
+                        //setting a default fragment
+                        setFragment(userFeedsFragment);
+                        selectFragment();
+                        if (task.getResult().exists()) {
+                            String image = task.getResult().getString("image");
+                            name = task.getResult().getString("name");
+                            username = task.getResult().getString("username");
+                            String bio = task.getResult().getString("bio");
                         }
                     }
                 });
