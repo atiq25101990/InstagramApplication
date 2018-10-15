@@ -11,6 +11,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -19,12 +20,13 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.HashMap;
+
 import mobileprogramming.unimelb.com.instagramapplication.utils.CommonUtils;
+import mobileprogramming.unimelb.com.instagramapplication.utils.Constant;
+import mobileprogramming.unimelb.com.instagramapplication.utils.SessionManagers;
 
 public class MainActivity extends AppCompatActivity {
-
-    public static String username;
-    public static String name;
     private Toolbar mainToolbar;
     private FirebaseAuth mAuth;
     private BottomNavigationView mMainNav;
@@ -58,32 +60,40 @@ public class MainActivity extends AppCompatActivity {
         photoFragment = new PhotoFragment();
         activityFeedsFragment = new ActivityFeedsFragment();
         profileFragment = new ProfileFragment();
+        if (!SessionManagers.getInstance().IsLogin()) {
+            FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+            if (currentUser != null) {
 
+                CommonUtils.showLoadingDialog(MainActivity.this);
+                user_id = mAuth.getCurrentUser().getUid();
+                mFirestore.collection("Users").document(user_id).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        CommonUtils.dismissProgressDialog();
+                        if (task.isSuccessful()) {
+                            if (task.getResult().exists()) {
+                                HashMap<String, String> userProfile = new HashMap<>();
+                                userProfile.put(Constant.KEY_USERID, "--");
+                                userProfile.put(Constant.KEY_EMAIL, "--");
+                                userProfile.put(Constant.KEY_NAME, task.getResult().getString("name"));
+                                userProfile.put(Constant.KEY_UNAME, task.getResult().getString("username"));
+                                SessionManagers.getInstance().setUserProfile(userProfile);
+                                setFragment(userFeedsFragment);
+                                selectFragment();
+                            }
 
-        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        if (currentUser != null) {
-
-            CommonUtils.showLoadingDialog(MainActivity.this);
-            user_id = mAuth.getCurrentUser().getUid();
-            mFirestore.collection("Users").document(user_id).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    CommonUtils.dismissProgressDialog();
-                    if (task.isSuccessful()) {
-                        //setting a default fragment
-                        setFragment(userFeedsFragment);
-                        selectFragment();
-                        if (task.getResult().exists()) {
-                            String image = task.getResult().getString("image");
-                            name = task.getResult().getString("name");
-                            username = task.getResult().getString("username");
-                            String bio = task.getResult().getString("bio");
+                        } else {
+                            Toast.makeText(MainActivity.this, "Something went wrong ! please try again !!", Toast.LENGTH_SHORT).show();
                         }
-
                     }
-                }
-            });
+                });
+            }
+        } else {
+            setFragment(userFeedsFragment);
+            selectFragment();
         }
+
+
     }
 
     private void selectFragment() {
@@ -146,8 +156,9 @@ public class MainActivity extends AppCompatActivity {
 
         switch (item.getItemId()) {
             case R.id.action_logout_btn:
-                //logout button is clicked
+
                 logout();
+                SessionManagers.getInstance().logoutUser(MainActivity.this);
                 return true;
 
             case R.id.action_settings_btn:

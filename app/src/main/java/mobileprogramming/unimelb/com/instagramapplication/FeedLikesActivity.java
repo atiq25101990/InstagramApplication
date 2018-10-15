@@ -55,7 +55,7 @@ public class FeedLikesActivity extends AppCompatActivity {
     private String uuid;
     private String postid;
     private String username;
-
+    HashMap<String, String> userDetails = new HashMap<>();
     private void setupToolbar() {
 
         toolbar.setTitle("Likes");
@@ -199,8 +199,6 @@ public class FeedLikesActivity extends AppCompatActivity {
     }
 
     private void getUserLikes() {
-
-
         CollectionReference citiesRef = db.collection("likes");
         Query query = citiesRef.whereEqualTo("postid", postid).limit(50);
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -209,6 +207,7 @@ public class FeedLikesActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     try {
                         for (QueryDocumentSnapshot document : task.getResult()) {
+
                             final ModelLikes m = new ModelLikes();
                             if (document.getData().containsKey("uid"))
                                 m.setUuid(document.getData().get("uid").toString());
@@ -225,6 +224,7 @@ public class FeedLikesActivity extends AppCompatActivity {
                             adapter.notifyDataSetChanged();
                         }
                     } catch (Exception e) {
+                        Log.d(TAG, e.getMessage());
                     }
                 } else {
                     Log.d(TAG, "Error getting documents.", task.getException());

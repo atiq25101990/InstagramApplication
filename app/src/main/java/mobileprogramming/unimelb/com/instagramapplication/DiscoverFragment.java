@@ -224,7 +224,7 @@ public class DiscoverFragment extends Fragment {
     private void getUsers() {
 
         CollectionReference citiesRef = db.collection("Users");
-        Query query = citiesRef.limit(200);
+        Query query = citiesRef.orderBy("username").limit(200);
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {

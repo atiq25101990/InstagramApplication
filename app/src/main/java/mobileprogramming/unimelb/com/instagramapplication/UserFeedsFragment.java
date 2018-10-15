@@ -35,12 +35,17 @@ import java.util.Map;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import mobileprogramming.unimelb.com.instagramapplication.adapter.FeedAdapter;
+import mobileprogramming.unimelb.com.instagramapplication.fragment.CustomeDialogFragment;
 import mobileprogramming.unimelb.com.instagramapplication.listener.OnItemClickListener;
+import mobileprogramming.unimelb.com.instagramapplication.listener.OnItemSelectedListener;
 import mobileprogramming.unimelb.com.instagramapplication.listener.OnLoadMoreListener;
 import mobileprogramming.unimelb.com.instagramapplication.listener.RecyclerViewLoadMoreScroll;
+import mobileprogramming.unimelb.com.instagramapplication.models.ItemSpinner;
 import mobileprogramming.unimelb.com.instagramapplication.models.Model;
 import mobileprogramming.unimelb.com.instagramapplication.models.ModelUsersFollowing;
 import mobileprogramming.unimelb.com.instagramapplication.utils.CommonUtils;
+import mobileprogramming.unimelb.com.instagramapplication.utils.Constant;
+import mobileprogramming.unimelb.com.instagramapplication.utils.SessionManagers;
 
 
 public class UserFeedsFragment extends Fragment {
@@ -59,7 +64,8 @@ public class UserFeedsFragment extends Fragment {
     private FragmentManager fm;
     private String TAG = "UserFeedsFragment";
     private String uuid;
-    private boolean sortDESC = true;
+
+    HashMap<String, String> userDetails = new HashMap<>();
 
     public UserFeedsFragment() {
     }
@@ -79,7 +85,7 @@ public class UserFeedsFragment extends Fragment {
         ButterKnife.bind(this, view);
         uuid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-
+        userDetails = SessionManagers.getInstance().getUserDetails();
         recyclerView.setHasFixedSize(true);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), OrientationHelper.VERTICAL, false);
         recyclerView.setLayoutManager(linearLayoutManager);
@@ -106,9 +112,10 @@ public class UserFeedsFragment extends Fragment {
                             if (task.isSuccessful()) {
                                 if (task.getResult().isEmpty()) {
                                     Map<String, Object> user = new HashMap<>();
+
                                     user.put("postid", feeds.get(position).getPostid());
                                     user.put("uid", uuid);
-                                    user.put("username", MainActivity.username);
+                                    user.put("username", userDetails.get(Constant.KEY_UNAME));
                                     db.collection("likes")
                                             .add(user)
                                             .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
@@ -138,9 +145,22 @@ public class UserFeedsFragment extends Fragment {
         fab_sort.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                feeds.clear();
-                sortDESC = !sortDESC;
-                getFeeds();
+
+                final ArrayList<ItemSpinner> itemOption = new ArrayList<>();
+                itemOption.add(new ItemSpinner(0, "Date/Time"));
+                itemOption.add(new ItemSpinner(1, "Location"));
+
+                CustomeDialogFragment customeDialogFragment = new CustomeDialogFragment(getContext(), R.layout.custome_dialog_fragment_withtitle, true, "Sort by", itemOption);
+                customeDialogFragment.setCancelable(false);
+                customeDialogFragment.show(fm, "");
+
+                customeDialogFragment.setItemSelectedListener(new OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(ItemSpinner itemSpinner) {
+                        feeds.clear();
+                        getFeeds(itemSpinner.getId());
+                    }
+                });
             }
         });
         feeds.clear();
@@ -180,7 +200,7 @@ public class UserFeedsFragment extends Fragment {
 
                         }
                     }
-                    getFeeds();
+                    getFeeds(0);
 
                 } else {
                     Log.d(TAG, "Error getting documents.", task.getException());
@@ -191,14 +211,18 @@ public class UserFeedsFragment extends Fragment {
 
     }
 
-    private void getFeeds() {
+    private void getFeeds(int id) {
+        //id ==0 for date/time
+        //id ==1 for location
+        //default id 0
+        Log.d("selected", "=>" + id);
         CommonUtils.showLoadingDialog(getContext());
         CollectionReference citiesRef = db.collection("post");
         Query query;
-        if (sortDESC) {
-            query = citiesRef.orderBy("date", Query.Direction.DESCENDING).orderBy("location").limit(100);
+        if (id == 0) {
+            query = citiesRef.orderBy("date", Query.Direction.DESCENDING).limit(100);
         } else {
-            query = citiesRef.orderBy("date", Query.Direction.ASCENDING).orderBy("location").limit(100);
+            query = citiesRef.orderBy("location", Query.Direction.ASCENDING).limit(100);
         }
         //please make change as per requirement in future
         //Query query = citiesRef.orderBy("date", Query.Direction.DESCENDING).orderBy("location",Query.Direction.ASCENDING).limit(100);
