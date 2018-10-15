@@ -195,11 +195,9 @@ public class DiscoverFragment extends Fragment {
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         if (task.isSuccessful()) {
                             final ModelUsersFollowing m = new ModelUsersFollowing();
-
                             m.setUuid(document.getData().get("uid").toString());
                             m.setFollowerid(document.getData().get("followerid").toString());
                             usersFollowings.add(m);
-
                         }
                     }
                 }
@@ -226,7 +224,7 @@ public class DiscoverFragment extends Fragment {
     private void getUsers() {
 
         CollectionReference citiesRef = db.collection("Users");
-        Query query = citiesRef.limit(200);
+        Query query = citiesRef.orderBy("username").limit(200);
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {

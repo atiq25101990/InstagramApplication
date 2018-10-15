@@ -22,6 +22,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -37,7 +38,8 @@ import mobileprogramming.unimelb.com.instagramapplication.adapter.FeedCommentsAd
 import mobileprogramming.unimelb.com.instagramapplication.listener.OnLoadMoreListener;
 import mobileprogramming.unimelb.com.instagramapplication.listener.RecyclerViewLoadMoreScroll;
 import mobileprogramming.unimelb.com.instagramapplication.models.ModelLikes;
-import mobileprogramming.unimelb.com.instagramapplication.utils.CommonUtils;
+import mobileprogramming.unimelb.com.instagramapplication.utils.Constant;
+import mobileprogramming.unimelb.com.instagramapplication.utils.SessionManagers;
 
 public class FeedCommentsActivity extends AppCompatActivity {
     @BindView(R.id.recyclerView)
@@ -56,10 +58,9 @@ public class FeedCommentsActivity extends AppCompatActivity {
     private String TAG = "UserFeedsFragment";
     private String uuid;
     private String postid;
-
+    HashMap<String, String> userDetails = new HashMap<>();
 
     private void setupToolbar() {
-
         toolbar.setTitle("Comments");
         setSupportActionBar(toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp);
@@ -69,7 +70,6 @@ public class FeedCommentsActivity extends AppCompatActivity {
                 supportFinishAfterTransition();
             }
         });
-
     }
 
     @Override
@@ -78,6 +78,7 @@ public class FeedCommentsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_feed_comments);
         ButterKnife.bind(this);
         setupToolbar();
+        userDetails=SessionManagers.getInstance().getUserDetails();
         fm = getSupportFragmentManager();
         uuid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         if (getIntent() != null) {
@@ -105,13 +106,14 @@ public class FeedCommentsActivity extends AppCompatActivity {
                     user.put("postid", postid);
                     user.put("uid", uuid);
                     user.put("text", edt_comments.getText().toString());
-                    user.put("username", MainActivity.username);
+                    user.put("commenttime", FieldValue.serverTimestamp());
+                    user.put("username", userDetails.get(Constant.KEY_UNAME));
                     db.collection("comments").add(user).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                         @Override
                         public void onSuccess(DocumentReference documentReference) {
                             final ModelLikes m = new ModelLikes();
                             m.setUuid(uuid);
-                            m.setUsername(MainActivity.username);
+                            m.setUsername(userDetails.get(Constant.KEY_UNAME));
                             m.setText(edt_comments.getText().toString());
                             feeds.add(m);
                             adapter.notifyDataSetChanged();
@@ -149,7 +151,7 @@ public class FeedCommentsActivity extends AppCompatActivity {
         feeds.clear();
 
         CollectionReference citiesRef = db.collection("comments");
-        Query query = citiesRef.whereEqualTo("postid", postid).limit(50);
+        Query query = citiesRef.whereEqualTo("postid", postid).orderBy("commenttime", Query.Direction.ASCENDING).limit(100);
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
