@@ -33,8 +33,8 @@ import java.util.Objects;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import de.hdodenhof.circleimageview.CircleImageView;
+import mobileprogramming.unimelb.com.instagramapplication.adapter.ProfileImageAdapter;
 import mobileprogramming.unimelb.com.instagramapplication.utils.CommonUtils;
-import mobileprogramming.unimelb.com.instagramapplication.utils.Constant;
 import mobileprogramming.unimelb.com.instagramapplication.utils.SessionManagers;
 
 
@@ -69,6 +69,7 @@ public class ProfileFragment extends Fragment {
     private int mFollowersCount;
     private int mFollowingCount;
     private int mPostCount;
+    private ArrayList<String> urlList = new ArrayList<>();
 
 
     public ProfileFragment() {
@@ -98,15 +99,13 @@ public class ProfileFragment extends Fragment {
         uuid = currentUser.getUid();
         userDetails = SessionManagers.getInstance().getUserDetails();
 
-        // Setting the values using the userdetails
-        profileUserName.setText(userDetails.get(Constant.KEY_UNAME));
-        profileDisplayName.setText(userDetails.get(Constant.KEY_NAME));
         CommonUtils.showLoadingDialog(getContext());
+        getPostedImages();
         getFollowingCount();
         getFollowerCount();
         setProfilePicture();
         getPostCount();
-        CommonUtils.dismissProgressDialog();
+
     }
 
     private void setProfilePicture() {
@@ -115,9 +114,11 @@ public class ProfileFragment extends Fragment {
         userDoc.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if(task.isSuccessful()){
+                if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
-                    if (document.exists()){
+                    if (document.exists()) {
+                        profileUserName.setText(String.valueOf(document.getString("username")));
+                        profileDisplayName.setText(String.valueOf(document.getString("name")));
                         Glide.with(getContext()).load(document.getString("image")).into(profileCircularPicture);
                     } else {
                         Log.d(TAG, "onComplete: Failed to get document");
@@ -128,10 +129,39 @@ public class ProfileFragment extends Fragment {
 
     }
 
+
+    private void getPostedImages() {
+
+        CollectionReference citiesRef = db.collection("post");
+
+        Query query = citiesRef.whereEqualTo("uid", uuid);
+
+        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    QuerySnapshot querySnapshot = task.getResult();
+                    for (QueryDocumentSnapshot documentReference : querySnapshot) {
+                        urlList.add(documentReference.getString("image"));
+                    }
+                    setPostedImages();
+                }
+            }
+        });
+
+    }
+
+    private void setPostedImages() {
+        ProfileImageAdapter profileImageAdapter = new ProfileImageAdapter(getContext());
+        profilePictureGrid.setAdapter(profileImageAdapter);
+        profileImageAdapter.setUrlList(urlList);
+        profileImageAdapter.notifyDataSetChanged();
+    }
+
     /**
      * Helper function to calculate the follower count for profile page
      */
-    private void getFollowerCount(){
+    private void getFollowerCount() {
         mFollowingCount = 0;
 
         // get the list of followers from collection
@@ -162,7 +192,7 @@ public class ProfileFragment extends Fragment {
     /**
      * Helper function to calculate the post count for profile page
      */
-    private void getPostCount(){
+    private void getPostCount() {
         mPostCount = 0;
 
         CollectionReference citiesRef = db.collection("post");
@@ -171,7 +201,8 @@ public class ProfileFragment extends Fragment {
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if(task.isSuccessful()){
+                if (task.isSuccessful()) {
+                    CommonUtils.dismissProgressDialog();
                     Log.d(TAG, "getPostCount: calculating the count");
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         if (task.isSuccessful()) {
@@ -189,7 +220,7 @@ public class ProfileFragment extends Fragment {
     /**
      * Helper function to calculate the following count for profile page
      */
-    private void getFollowingCount(){
+    private void getFollowingCount() {
         mFollowersCount = 0;
 
         CollectionReference citiesRef = db.collection("follower");

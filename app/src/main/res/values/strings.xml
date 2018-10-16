@@ -52,4 +52,5 @@
     <string name="profile_fragment_text">Profile Fragment</string>
     <string name="userfeeds_fragment_text">User Feeds Fragment</string>
     <string name="edit_profile_text">Edit your Profile</string>
+    <string name="photos_posted_text">Photos Posted</string>
 </resources>
