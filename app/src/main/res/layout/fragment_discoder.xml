@@ -7,15 +7,16 @@
 
     <EditText
         android:id="@+id/edt_search"
-        android:hint="Search by username"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="62dp"
+        android:hint="Search by username" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/edt_search"></android.support.v7.widget.RecyclerView>
+        android:layout_height="505dp"
+        android:layout_below="@id/edt_search"
+        android:layout_marginTop="0dp"></android.support.v7.widget.RecyclerView>
 
 
 </RelativeLayout>
