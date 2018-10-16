@@ -1,5 +1,6 @@
 package mobileprogramming.unimelb.com.instagramapplication.adapter;
 
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
@@ -14,6 +15,8 @@ import com.bumptech.glide.Glide;
 import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import mobileprogramming.unimelb.com.instagramapplication.MainActivity;
+import mobileprogramming.unimelb.com.instagramapplication.ProfileFragment;
 import mobileprogramming.unimelb.com.instagramapplication.R;
 import mobileprogramming.unimelb.com.instagramapplication.listener.OnItemClickListener;
 import mobileprogramming.unimelb.com.instagramapplication.models.Model;
@@ -113,9 +116,10 @@ public class UsersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         if (object != null) {
             switch (object.getType()) {
                 case Model.IMAGE_TYPE:
-                    ImageTypeViewHolder imageTypeViewHolder = (ImageTypeViewHolder) holder;
+                    final ImageTypeViewHolder imageTypeViewHolder = (ImageTypeViewHolder) holder;
                     imageTypeViewHolder.txt_username.setText(String.valueOf(object.getUsername()));
                     Glide.with(mContext).load(object.getImage()).into(imageTypeViewHolder.background);
+                    imageTypeViewHolder.uid = object.getUuid();
                     if (!object.isFollwing()) {
                         imageTypeViewHolder.btn_follow.setText("Follow");
 
@@ -124,6 +128,38 @@ public class UsersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
 
                     }
+
+                    imageTypeViewHolder.background.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Bundle bundle = new Bundle();
+                            bundle.putString("uid", imageTypeViewHolder.uid);
+
+                            AppCompatActivity mainActivity = (MainActivity) mContext;
+                            ProfileFragment profileFragment = new ProfileFragment();
+                            profileFragment.setArguments(bundle);
+                            mainActivity.getSupportFragmentManager().beginTransaction()
+                                    .replace(R.id.main_frame, profileFragment)
+                                    .addToBackStack(null)
+                                    .commit();
+                        }
+                    });
+
+                    imageTypeViewHolder.txt_username.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Bundle bundle = new Bundle();
+                            bundle.putString("uid", imageTypeViewHolder.uid);
+
+                            AppCompatActivity mainActivity = (MainActivity) mContext;
+                            ProfileFragment profileFragment = new ProfileFragment();
+                            profileFragment.setArguments(bundle);
+                            mainActivity.getSupportFragmentManager().beginTransaction()
+                                    .replace(R.id.main_frame, profileFragment)
+                                    .addToBackStack(null)
+                                    .commit();
+                        }
+                    });
 
                     imageTypeViewHolder.btn_follow.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -156,8 +192,10 @@ public class UsersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         TextView txt_username;
         CircleImageView background;
         Button btn_follow;
+        String uid;
 
-        public ImageTypeViewHolder(View itemView) {
+
+        public ImageTypeViewHolder(final View itemView) {
             super(itemView);
             txt_username = itemView.findViewById(R.id.txt_username);
             background = itemView.findViewById(R.id.background);
@@ -165,6 +203,7 @@ public class UsersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         }
 
     }
+
 
 
 }

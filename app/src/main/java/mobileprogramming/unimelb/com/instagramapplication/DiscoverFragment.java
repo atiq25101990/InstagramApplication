@@ -48,8 +48,8 @@ import mobileprogramming.unimelb.com.instagramapplication.utils.CommonUtils;
 
 public class DiscoverFragment extends Fragment {
 
-    @BindView(R.id.recyclerView)
-    RecyclerView recyclerView;
+    @BindView(R.id.discoverRecyclerView)
+    RecyclerView mDiscoverRecyclerView;
     @BindView(R.id.edt_search)
     EditText edt_search;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -75,18 +75,21 @@ public class DiscoverFragment extends Fragment {
         return view;
     }
 
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
+
         uuid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
+        ((MainActivity) getActivity()).setBottomNavigationView();
 
-        recyclerView.setHasFixedSize(true);
+        mDiscoverRecyclerView.setHasFixedSize(true);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), OrientationHelper.VERTICAL, false);
-        recyclerView.setLayoutManager(linearLayoutManager);
+        mDiscoverRecyclerView.setLayoutManager(linearLayoutManager);
         adapter = new UsersAdapter((AppCompatActivity) getActivity(), feedsSearchResult);
-        recyclerView.setAdapter(adapter);
+        mDiscoverRecyclerView.setAdapter(adapter);
         scrollListener = new RecyclerViewLoadMoreScroll(linearLayoutManager);
         scrollListener.setOnLoadMoreListener(new OnLoadMoreListener() {
             @Override
@@ -94,7 +97,7 @@ public class DiscoverFragment extends Fragment {
                 LoadMoreData();
             }
         });
-        recyclerView.addOnScrollListener(scrollListener);
+        mDiscoverRecyclerView.addOnScrollListener(scrollListener);
         adapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(final int position, int in) {

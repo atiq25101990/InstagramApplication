@@ -65,7 +65,8 @@ public class ProfileFragment extends Fragment {
     TextView profileUserName;
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private FirebaseUser currentUser;
+//    private FirebaseUser currentUser;
+    private String currentUserID;
     private int mFollowersCount;
     private int mFollowingCount;
     private int mPostCount;
@@ -91,13 +92,17 @@ public class ProfileFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        assert getArguments() != null;
+        uuid = getArguments().getString("uid");
+        Log.d(TAG, "onViewCreated: The username is " + uuid);
+
         // Binding views with Butterknife
         ButterKnife.bind(this, view);
 
         // Getting user details from Firebase
-        currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        uuid = currentUser.getUid();
-        userDetails = SessionManagers.getInstance().getUserDetails();
+        currentUserID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+//        uuid = currentUser.getUid();
+//        userDetails = SessionManagers.getInstance().getUserDetails();
 
         CommonUtils.showLoadingDialog(getContext());
         getPostedImages();

@@ -2,6 +2,7 @@ package mobileprogramming.unimelb.com.instagramapplication.adapter;
 
 import android.content.Intent;
 import android.media.MediaPlayer;
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -32,6 +33,8 @@ import java.util.Date;
 import de.hdodenhof.circleimageview.CircleImageView;
 import mobileprogramming.unimelb.com.instagramapplication.FeedCommentsActivity;
 import mobileprogramming.unimelb.com.instagramapplication.FeedLikesActivity;
+import mobileprogramming.unimelb.com.instagramapplication.MainActivity;
+import mobileprogramming.unimelb.com.instagramapplication.ProfileFragment;
 import mobileprogramming.unimelb.com.instagramapplication.R;
 import mobileprogramming.unimelb.com.instagramapplication.listener.OnItemClickListener;
 import mobileprogramming.unimelb.com.instagramapplication.models.Model;
@@ -137,6 +140,7 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     final ImageTypeViewHolder imageTypeViewHolder = (ImageTypeViewHolder) holder;
                     imageTypeViewHolder.txt_likes.setText(String.valueOf(object.getLikes()) + " Total likes");
                     imageTypeViewHolder.txt_username.setText(String.valueOf(object.getUsername()));
+                    imageTypeViewHolder.uid = object.getUuid();
                     SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM dd HH:mm:ss Z yyyy");
 
                     SimpleDateFormat formatterOut = new SimpleDateFormat("HH:mm:ss dd MMM yyyy");
@@ -147,6 +151,37 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                         e.printStackTrace();
                     }
 
+                    imageTypeViewHolder.txt_username.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Bundle bundle = new Bundle();
+                            bundle.putString("uid", imageTypeViewHolder.uid);
+
+                            AppCompatActivity mainActivity = (MainActivity) mContext;
+                            ProfileFragment profileFragment = new ProfileFragment();
+                            profileFragment.setArguments(bundle);
+                            mainActivity.getSupportFragmentManager().beginTransaction()
+                                    .replace(R.id.main_frame, profileFragment)
+                                    .addToBackStack(null)
+                                    .commit();
+                        }
+                    });
+
+                    imageTypeViewHolder.background.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Bundle bundle = new Bundle();
+                            bundle.putString("uid", imageTypeViewHolder.uid);
+
+                            AppCompatActivity mainActivity = (MainActivity) mContext;
+                            ProfileFragment profileFragment = new ProfileFragment();
+                            profileFragment.setArguments(bundle);
+                            mainActivity.getSupportFragmentManager().beginTransaction()
+                                    .replace(R.id.main_frame, profileFragment)
+                                    .addToBackStack(null)
+                                    .commit();
+                        }
+                    });
 
                     imageTypeViewHolder.txt_likes.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -246,6 +281,8 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         TextView txt_date;
         ImageView btn_like;
         ImageButton btnOption;
+        String uid;
+
 
         public ImageTypeViewHolder(View itemView) {
             super(itemView);
