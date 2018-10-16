@@ -48,10 +48,13 @@ import mobileprogramming.unimelb.com.instagramapplication.utils.CommonUtils;
 
 public class DiscoverFragment extends Fragment {
 
-    @BindView(R.id.recyclerView)
+    @BindView(R.id.recyclerViewDiscover)
     RecyclerView recyclerView;
     @BindView(R.id.edt_search)
     EditText edt_search;
+    @BindView(R.id.recyclerViewSuggestions)
+    RecyclerView recyclerViewSuggestions;
+
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     private UsersAdapter adapter;
     private ArrayList<ModelUsers> feeds = new ArrayList<>();
@@ -156,6 +159,23 @@ public class DiscoverFragment extends Fragment {
 
             }
         });
+
+
+        recyclerViewSuggestions.setHasFixedSize(true);
+        LinearLayoutManager horizontalLayoutManagerSug = new LinearLayoutManager(getContext(), OrientationHelper.HORIZONTAL, false);
+        recyclerViewSuggestions.setLayoutManager(horizontalLayoutManagerSug);
+        adapter = new UsersAdapter((AppCompatActivity) getActivity(), feedsSearchResult);
+        recyclerViewSuggestions.setAdapter(adapter);
+        scrollListener = new RecyclerViewLoadMoreScroll(horizontalLayoutManagerSug);
+        scrollListener.setOnLoadMoreListener(new OnLoadMoreListener() {
+            @Override
+            public void onLoadMore() {
+                LoadMoreData();
+            }
+        });
+        recyclerViewSuggestions.addOnScrollListener(scrollListener);
+
+
         feeds.clear();
         feedsSearchResult.clear();
         getFollowingUsers();
