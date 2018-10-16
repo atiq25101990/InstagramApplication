@@ -52,6 +52,9 @@ public class DiscoverFragment extends Fragment {
     RecyclerView mDiscoverRecyclerView;
     @BindView(R.id.edt_search)
     EditText edt_search;
+    @BindView(R.id.recyclerViewSuggestions)
+    RecyclerView recyclerViewSuggestions;
+
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     private UsersAdapter adapter;
     private ArrayList<ModelUsers> feeds = new ArrayList<>();
@@ -75,15 +78,12 @@ public class DiscoverFragment extends Fragment {
         return view;
     }
 
-
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
-
         uuid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        ((MainActivity) getActivity()).setBottomNavigationView();
 
         mDiscoverRecyclerView.setHasFixedSize(true);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), OrientationHelper.VERTICAL, false);
@@ -159,6 +159,23 @@ public class DiscoverFragment extends Fragment {
 
             }
         });
+
+
+        recyclerViewSuggestions.setHasFixedSize(true);
+        LinearLayoutManager horizontalLayoutManagerSug = new LinearLayoutManager(getContext(), OrientationHelper.HORIZONTAL, false);
+        recyclerViewSuggestions.setLayoutManager(horizontalLayoutManagerSug);
+        adapter = new UsersAdapter((AppCompatActivity) getActivity(), feedsSearchResult);
+        recyclerViewSuggestions.setAdapter(adapter);
+        scrollListener = new RecyclerViewLoadMoreScroll(horizontalLayoutManagerSug);
+        scrollListener.setOnLoadMoreListener(new OnLoadMoreListener() {
+            @Override
+            public void onLoadMore() {
+                LoadMoreData();
+            }
+        });
+        recyclerViewSuggestions.addOnScrollListener(scrollListener);
+
+
         feeds.clear();
         feedsSearchResult.clear();
         getFollowingUsers();
