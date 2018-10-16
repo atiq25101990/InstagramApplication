@@ -20,7 +20,7 @@
                 android:id="@+id/profileCircularPicture"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
+                android:layout_weight="2"
                 android:padding="12dp"
                 app:civ_border_color="@color/black"
                 app:civ_border_width="1dp" />
@@ -29,9 +29,10 @@
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="3"
+                android:layout_weight="4"
                 android:orientation="vertical"
-                android:padding="8dp">
+                android:paddingTop="16dp"
+                android:paddingBottom="24dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -47,7 +48,8 @@
                         android:text="250"
                         android:textAlignment="center"
                         android:textColor="@color/black"
-                        android:textSize="18sp" />
+                        android:textSize="28sp"
+                        android:textStyle="bold" />
 
 
                     <TextView
@@ -58,7 +60,8 @@
                         android:text="300"
                         android:textAlignment="center"
                         android:textColor="@color/black"
-                        android:textSize="18sp" />
+                        android:textSize="28sp"
+                        android:textStyle="bold" />
 
 
                     <TextView
@@ -69,7 +72,8 @@
                         android:text="200"
                         android:textAlignment="center"
                         android:textColor="@color/black"
-                        android:textSize="18sp" />
+                        android:textSize="28sp"
+                        android:textStyle="bold" />
 
                 </LinearLayout>
 
@@ -77,7 +81,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:padding="8dp">
+                    android:padding="8dp"
+                    android:paddingTop="16dp">
 
                     <TextView
                         android:id="@+id/textPosts"
@@ -85,7 +90,9 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="posts"
-                        android:textAlignment="center" />
+                        android:textAlignment="center"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/textFollowers"
@@ -93,7 +100,9 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="followers"
-                        android:textAlignment="center" />
+                        android:textAlignment="center"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/textFollowing"
@@ -101,10 +110,27 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="following"
-                        android:textAlignment="center" />
+                        android:textAlignment="center"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
 
                 </LinearLayout>
+
+                <TextView
+                    android:id="@+id/textEditProfile"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="3"
+                    android:paddingStart="16dp"
+                    android:text="@string/edit_profile_text"
+                    android:textAlignment="center"
+                    android:textColor="@color/black"
+                    android:textSize="20sp" />
             </LinearLayout>
+
+
         </LinearLayout>
 
         <LinearLayout
@@ -114,25 +140,20 @@
             android:orientation="horizontal">
 
             <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
                 android:id="@+id/profileDisplayName"
-                android:text="Yaba daba do"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:text="Test"
                 android:textAlignment="center"
-                android:textColor="@color/black" />
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/textEditProfile"
                 android:layout_width="0dp"
-                android:layout_height="24dp"
-                android:layout_marginEnd="8dp"
-                android:layout_weight="3"
-                android:paddingStart="16dp"
-                android:text="@string/edit_profile_text"
-                android:textAlignment="center"
-                android:textColor="@color/black" />
-
+                android:layout_height="wrap_content"
+                android:layout_weight="4" />
 
         </LinearLayout>
 

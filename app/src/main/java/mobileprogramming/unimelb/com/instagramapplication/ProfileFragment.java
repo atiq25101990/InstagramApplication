@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.GridView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -100,8 +101,28 @@ public class ProfileFragment extends Fragment {
         CommonUtils.showLoadingDialog(getContext());
         getFollowingCount();
         getFollowerCount();
+        setProfilePicture();
         getPostCount();
+        CommonUtils.dismissProgressDialog();
+    }
 
+    private void setProfilePicture() {
+        CollectionReference citiesRef = db.collection("Users");
+
+        // query all the users followed by this uuid
+        Query query = citiesRef.whereEqualTo("uid", uuid);
+        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()){
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+
+                        Log.d(TAG, "onComplete: profileURL " + document.getString("image"));
+                        Glide.with(getContext()).load(document.getString("image")).into(profileCircularPicture);
+                    }
+                }
+            }
+        });
     }
 
     /**
@@ -135,7 +156,9 @@ public class ProfileFragment extends Fragment {
         });
     }
 
-
+    /**
+     * Helper function to calculate the post count for profile page
+     */
     private void getPostCount(){
         mPostCount = 0;
 
@@ -145,7 +168,6 @@ public class ProfileFragment extends Fragment {
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                CommonUtils.dismissProgressDialog();
                 if(task.isSuccessful()){
                     Log.d(TAG, "getPostCount: calculating the count");
                     for (QueryDocumentSnapshot document : task.getResult()) {
@@ -161,7 +183,9 @@ public class ProfileFragment extends Fragment {
         });
     }
 
-
+    /**
+     * Helper function to calculate the following count for profile page
+     */
     private void getFollowingCount(){
         mFollowersCount = 0;
 
