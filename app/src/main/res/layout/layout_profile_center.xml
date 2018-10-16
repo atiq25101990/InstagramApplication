@@ -168,7 +168,9 @@
             android:paddingTop="16dp"
             android:paddingBottom="16dp"
             android:text="@string/photos_posted_text"
-            android:textSize="18sp" />
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:textStyle="bold" />
         <View
             android:layout_width="fill_parent"
             android:layout_height="2dp"

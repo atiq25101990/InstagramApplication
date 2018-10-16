@@ -141,6 +141,7 @@ public class ProfileFragment extends Fragment {
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
                     QuerySnapshot querySnapshot = task.getResult();
+                    urlList.clear();
                     for (QueryDocumentSnapshot documentReference : querySnapshot) {
                         urlList.add(documentReference.getString("image"));
                     }
@@ -153,9 +154,9 @@ public class ProfileFragment extends Fragment {
 
     private void setPostedImages() {
         ProfileImageAdapter profileImageAdapter = new ProfileImageAdapter(getContext());
-        profilePictureGrid.setAdapter(profileImageAdapter);
         profileImageAdapter.setUrlList(urlList);
         profileImageAdapter.notifyDataSetChanged();
+        profilePictureGrid.setAdapter(profileImageAdapter);
     }
 
     /**

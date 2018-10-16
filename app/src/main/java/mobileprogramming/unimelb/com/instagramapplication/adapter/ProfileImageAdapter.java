@@ -1,8 +1,10 @@
 package mobileprogramming.unimelb.com.instagramapplication.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 
@@ -26,12 +28,12 @@ public class ProfileImageAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return 0;
+        return urlList.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return null;
+        return urlList.get(position);
     }
 
     @Override
@@ -45,14 +47,16 @@ public class ProfileImageAdapter extends BaseAdapter {
         if (convertView == null) {
             // if it's not recycled, initialize some attributes
             imageView = new ImageView(mContext);
-            imageView.setLayoutParams(new ViewGroup.LayoutParams(85, 85));
+            Glide.with(mContext).load(urlList.get(position)).into(imageView);
+//            imageView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+            imageView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, 300));
+
             imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            imageView.setPadding(8, 8, 8, 8);
+            imageView.setPadding(4, 4, 4, 4);
         } else {
             imageView = (ImageView) convertView;
         }
-
-        Glide.with(mContext).load(urlList.get(position)).into(imageView);
+        Log.d(TAG, "getView: Setting new Image: " + position);
         return imageView;
     }
 }
