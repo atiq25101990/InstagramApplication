@@ -8,15 +8,24 @@
     <EditText
         android:id="@+id/edt_search"
         android:layout_width="match_parent"
-        android:layout_height="62dp"
+        android:layout_height="61dp"
         android:hint="Search by username" />
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/recyclerView"
+        android:id="@+id/recyclerViewDiscover"
         android:layout_width="match_parent"
-        android:layout_height="505dp"
+        android:layout_height="415dp"
         android:layout_below="@id/edt_search"
-        android:layout_marginTop="0dp"></android.support.v7.widget.RecyclerView>
+        android:layout_marginTop="91dp"></android.support.v7.widget.RecyclerView>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerViewSuggestions"
+        android:layout_width="match_parent"
+        android:layout_height="92dp"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/edt_search"
+        android:layout_marginTop="-1dp"
+        android:orientation="horizontal" />
 
 
 </RelativeLayout>
