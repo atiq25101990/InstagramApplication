@@ -31,6 +31,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -75,7 +76,7 @@ public class UserFeedsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_userfeeds, container, false);
-        fm = getActivity().getSupportFragmentManager();
+        fm = Objects.requireNonNull(getActivity()).getSupportFragmentManager();
         return view;
     }
 

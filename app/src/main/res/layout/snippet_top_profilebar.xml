@@ -15,23 +15,15 @@
                 android:layout_height="match_parent">
 
                 <TextView
-                    android:id="@+id/userName"
+                    android:id="@+id/profile_user_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:layout_marginStart="12dp"
-                    android:text="razdibhai"
+                    android:text="username"
                     android:textColor="@color/colorGrey"
                     android:textSize="18sp" />
 
-                <ImageView
-                    android:id="@+id/ic_menu_dots"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginEnd="20dp"
-                    android:src="@drawable/ic_menu_dots" />
 
             </RelativeLayout>
         </android.support.v7.widget.Toolbar>
