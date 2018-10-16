@@ -1,0 +1,56 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/card_view"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="#FFFFFF"
+    android:padding="5dp">
+
+
+
+        <RelativeLayout
+            android:layout_width="202dp"
+            android:layout_height="115dp"
+            android:layout_marginTop="5dp"
+            android:padding="3dp">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/background_suggest"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/instagram32"
+                app:civ_border_color="#00000000"
+                app:civ_border_width="2dp" />
+
+
+            <TextView
+                android:id="@+id/txt_username_suggest"
+                android:layout_width="129dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_alignStart="@+id/btn_follow_suggest"
+                android:layout_marginTop="13dp"
+                android:text="Username"
+                android:textColor="#000"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+
+            <Button
+                android:id="@+id/btn_follow_suggest"
+                android:layout_width="wrap_content"
+                android:layout_height="40sp"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="13dp"
+                android:backgroundTint="@color/colorPrimaryDark"
+                android:inputType="text"
+                android:text="Follow"
+                android:textColor="@color/colorWhite" />
+        </RelativeLayout>
+
+
+
+</RelativeLayout>
+
