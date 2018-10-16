@@ -16,7 +16,8 @@
         android:layout_width="match_parent"
         android:layout_height="415dp"
         android:layout_below="@id/edt_search"
-        android:layout_marginTop="91dp"/>
+        android:layout_marginTop="90dp"/>
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerViewSuggestions"
         android:layout_width="match_parent"

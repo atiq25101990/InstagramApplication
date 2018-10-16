@@ -48,7 +48,7 @@ public class ProfileImageAdapter extends BaseAdapter {
             // if it's not recycled, initialize some attributes
             imageView = new ImageView(mContext);
             Glide.with(mContext).load(urlList.get(position)).into(imageView);
-//            imageView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+
             imageView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, 300));
 
             imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);

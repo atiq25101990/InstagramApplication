@@ -136,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void setFragment(Fragment fragment) {
         Bundle bundle = new Bundle();
-        bundle.putString("uid", FirebaseAuth.getInstance().getUid());
+        bundle.putString("uid", FirebaseAuth.getInstance().getCurrentUser().getUid());
         fragment.setArguments(bundle);
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.main_frame, fragment).addToBackStack(null);

@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
+import java.sql.BatchUpdateException;
 import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -134,6 +135,7 @@ public class UsersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                         public void onClick(View v) {
                             Bundle bundle = new Bundle();
                             bundle.putString("uid", imageTypeViewHolder.uid);
+                            bundle.putBoolean("followed", object.isFollwing());
 
                             AppCompatActivity mainActivity = (MainActivity) mContext;
                             ProfileFragment profileFragment = new ProfileFragment();

@@ -49,7 +49,8 @@ public class ProfileFragment extends Fragment {
 
     @BindView(R.id.profileCircularPicture)
     CircleImageView profileCircularPicture;
-
+    @BindView(R.id.textEditProfile)
+    TextView textViewEditProfile;
     @BindView(R.id.textViewPosts)
     TextView textViewPosts;
     @BindView(R.id.textViewFollowers)
@@ -92,15 +93,24 @@ public class ProfileFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        assert getArguments() != null;
-        uuid = getArguments().getString("uid");
-        Log.d(TAG, "onViewCreated: The username is " + uuid);
-
         // Binding views with Butterknife
         ButterKnife.bind(this, view);
 
+        assert getArguments() != null;
+        uuid = getArguments().getString("uid");
         // Getting user details from Firebase
         currentUserID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        if (!uuid.equals(currentUserID)){
+            if(getArguments().getBoolean("followed")){
+                textViewEditProfile.setText("Unfollow");
+            } else {
+                textViewEditProfile.setText("Follow");
+            }
+        }
+        Log.d(TAG, "onViewCreated: The username is " + uuid);
+
+
 //        uuid = currentUser.getUid();
 //        userDetails = SessionManagers.getInstance().getUserDetails();
 

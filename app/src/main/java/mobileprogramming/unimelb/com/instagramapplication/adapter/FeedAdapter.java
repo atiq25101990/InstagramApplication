@@ -156,6 +156,7 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                         public void onClick(View v) {
                             Bundle bundle = new Bundle();
                             bundle.putString("uid", imageTypeViewHolder.uid);
+                            bundle.putBoolean("followed", true);
 
                             AppCompatActivity mainActivity = (MainActivity) mContext;
                             ProfileFragment profileFragment = new ProfileFragment();
