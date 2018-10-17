@@ -4,6 +4,16 @@ package mobileprogramming.unimelb.com.instagramapplication.models;
 public class ModelUsersFollowing {
     private String uuid;
     private String followerid;
+    private String date;
+
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
 
     public String getFollowDate() {
         return followDate;
