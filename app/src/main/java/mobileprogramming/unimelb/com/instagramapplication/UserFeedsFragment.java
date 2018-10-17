@@ -29,6 +29,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -114,13 +115,14 @@ public class UserFeedsFragment extends Fragment {
                         public void onComplete(@NonNull Task<QuerySnapshot> task) {
                             if (task.isSuccessful()) {
                                 if (task.getResult().isEmpty()) {
-                                    Map<String, Object> user = new HashMap<>();
+                                    Map<String, Object> likeObject = new HashMap<>();
 
-                                    user.put("postid", feeds.get(position).getPostid());
-                                    user.put("uid", uuid);
-                                    user.put("username", userDetails.get(Constant.KEY_UNAME));
+                                    likeObject.put("postid", feeds.get(position).getPostid());
+                                    likeObject.put("uid", uuid);
+                                    likeObject.put("username", userDetails.get(Constant.KEY_UNAME));
+                                    likeObject.put("date", Calendar.getInstance().getTime());
                                     db.collection("likes")
-                                            .add(user)
+                                            .add(likeObject)
                                             .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                                                 @Override
                                                 public void onSuccess(DocumentReference documentReference) {
@@ -186,13 +188,11 @@ public class UserFeedsFragment extends Fragment {
     }
 
     private void getFollowingUsers() {
-        CommonUtils.showLoadingDialog(getContext());
         CollectionReference citiesRef = db.collection("follower");
         Query query = citiesRef.whereEqualTo("followerid", uuid).limit(100);
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                CommonUtils.dismissProgressDialog();
                 if (task.isSuccessful()) {
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         if (task.isSuccessful()) {

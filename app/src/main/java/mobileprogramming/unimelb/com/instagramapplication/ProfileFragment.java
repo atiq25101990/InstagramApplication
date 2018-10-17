@@ -110,10 +110,6 @@ public class ProfileFragment extends Fragment {
         }
         Log.d(TAG, "onViewCreated: The username is " + uuid);
 
-
-//        uuid = currentUser.getUid();
-//        userDetails = SessionManagers.getInstance().getUserDetails();
-
         CommonUtils.showLoadingDialog(getContext());
         getPostedImages();
         getFollowingCount();

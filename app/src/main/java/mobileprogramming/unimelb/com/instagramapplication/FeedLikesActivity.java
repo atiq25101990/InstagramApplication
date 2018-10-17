@@ -27,6 +27,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.WriteBatch;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -106,6 +107,7 @@ public class FeedLikesActivity extends AppCompatActivity {
                     Map<String, Object> user = new HashMap<>();
                     user.put("followerid", uuid);
                     user.put("uid", feeds.get(position).getUuid());
+                    user.put("date", Calendar.getInstance().getTime());
                     //data2.put("regions", Arrays.asList("west_coast", "socal"));
                     //user.put("username", feeds.get(position).getUsername());
                     db.collection("follower")
