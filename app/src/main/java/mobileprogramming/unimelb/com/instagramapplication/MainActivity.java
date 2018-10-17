@@ -1,11 +1,11 @@
 package mobileprogramming.unimelb.com.instagramapplication;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -20,8 +20,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.util.HashMap;
+import java.util.List;
 
 import mobileprogramming.unimelb.com.instagramapplication.Share.PhotoFragment;
 import mobileprogramming.unimelb.com.instagramapplication.Share.ShareActivity;
@@ -29,10 +31,6 @@ import mobileprogramming.unimelb.com.instagramapplication.utils.CommonUtils;
 import mobileprogramming.unimelb.com.instagramapplication.utils.Constant;
 import mobileprogramming.unimelb.com.instagramapplication.utils.SessionManagers;
 import mobileprogramming.unimelb.com.instagramapplication.utils.UniversalImageLoader;
-
-import com.nostra13.universalimageloader.core.ImageLoader;
-import mobileprogramming.unimelb.com.instagramapplication.R;
-
 
 public class MainActivity extends AppCompatActivity {
     private Toolbar mainToolbar;
@@ -46,13 +44,11 @@ public class MainActivity extends AppCompatActivity {
     private ProfileFragment profileFragment;
     private FirebaseFirestore mFirestore;
     private String user_id;
-    private Context mContext = MainActivity.this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         initImageLoader();
 
         mAuth = FirebaseAuth.getInstance();
@@ -61,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(mainToolbar);
 
         getSupportActionBar().setTitle("Instagram");
-         // checking gi t ,erge
+        // checking gi t ,erge
 
         mMainFrame = (FrameLayout) findViewById(R.id.main_frame);
         mMainNav = (BottomNavigationView) findViewById(R.id.main_nav);
@@ -80,7 +76,6 @@ public class MainActivity extends AppCompatActivity {
                 mFirestore.collection("Users").document(user_id).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        CommonUtils.dismissProgressDialog();
                         if (task.isSuccessful()) {
                             if (task.getResult().exists()) {
                                 HashMap<String, String> userProfile = new HashMap<>();
@@ -104,11 +99,12 @@ public class MainActivity extends AppCompatActivity {
             selectFragment();
         }
 
-
+        CommonUtils.dismissProgressDialog();
     }
 
-    private void initImageLoader(){
-        UniversalImageLoader universalImageLoader = new UniversalImageLoader(mContext);
+
+    private void initImageLoader() {
+        UniversalImageLoader universalImageLoader = new UniversalImageLoader(this);
         ImageLoader.getInstance().init(universalImageLoader.getConfig());
     }
 
@@ -120,29 +116,24 @@ public class MainActivity extends AppCompatActivity {
                 switch (item.getItemId()) {
 
                     case R.id.nav_userfeeds:
-                        mMainNav.setItemBackgroundResource(R.color.colorPrimary);
                         setFragment(userFeedsFragment);
                         return true;
 
                     case R.id.nav_discover:
-                        mMainNav.setItemBackgroundResource(R.color.colorPrimary);
                         setFragment(discoverFragment);
                         return true;
 
                     case R.id.nav_photo:
-                        mMainNav.setItemBackgroundResource(R.color.colorPrimary);
                         //setFragment(photoFragment);
                         Intent shareActivityIntent = new Intent(MainActivity.this, ShareActivity.class);
                         startActivity(shareActivityIntent);
                         return true;
 
                     case R.id.nav_activityfeeds:
-                        mMainNav.setItemBackgroundResource(R.color.colorPrimary);
                         setFragment(activityFeedsFragment);
                         return true;
 
                     case R.id.nav_profile:
-                        mMainNav.setItemBackgroundResource(R.color.colorPrimary);
                         setFragment(profileFragment);
                         return true;
 
@@ -150,14 +141,17 @@ public class MainActivity extends AppCompatActivity {
                         return false;
                 }
 
+
             }
         });
     }
 
     private void setFragment(Fragment fragment) {
-
+        Bundle bundle = new Bundle();
+        bundle.putString("uid", FirebaseAuth.getInstance().getCurrentUser().getUid());
+        fragment.setArguments(bundle);
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.main_frame, fragment);
+        fragmentTransaction.replace(R.id.main_frame, fragment).addToBackStack(null);
         fragmentTransaction.commit();
     }
 
@@ -188,6 +182,40 @@ public class MainActivity extends AppCompatActivity {
             default:
                 return false;
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+    }
+
+    public void setBottomNavigationView() {
+        Fragment fragment = getVisibleFragment();
+        if (fragment != null) {
+            if (fragment instanceof UserFeedsFragment && mMainNav.getSelectedItemId() != R.id.nav_userfeeds) {
+                mMainNav.setSelectedItemId(R.id.nav_userfeeds);
+            } else if (fragment instanceof DiscoverFragment && mMainNav.getSelectedItemId() != R.id.nav_discover) {
+                mMainNav.setSelectedItemId(R.id.nav_discover);
+            } else if (fragment instanceof PhotoFragment && mMainNav.getSelectedItemId() != R.id.nav_photo) {
+                mMainNav.setSelectedItemId(R.id.nav_photo);
+            } else if (fragment instanceof ActivityFeedsFragment && mMainNav.getSelectedItemId() != R.id.nav_activityfeeds) {
+                mMainNav.setSelectedItemId(R.id.nav_activityfeeds);
+            } else if (fragment instanceof ProfileFragment && mMainNav.getSelectedItemId() != R.id.nav_profile) {
+                mMainNav.setSelectedItemId(R.id.nav_profile);
+            }
+        }
+    }
+
+    public Fragment getVisibleFragment() {
+        FragmentManager fragmentManager = MainActivity.this.getSupportFragmentManager();
+        List<Fragment> fragments = fragmentManager.getFragments();
+        if (fragments != null) {
+            for (Fragment fragment : fragments) {
+                if (fragment != null && fragment.isVisible())
+                    return fragment;
+            }
+        }
+        return null;
     }
 
     private void logout() {

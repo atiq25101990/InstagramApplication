@@ -44,8 +44,7 @@ dependencies {
     //Recyclerview
     implementation "com.android.support:recyclerview-v7:27.0.2"
     //Cardview
-    implementation 'com.android.support:cardview-v7:27+'
-    //Universal image loader
+    implementation 'com.android.support:cardview-v7:27+'//Universal image loader
     implementation 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
     //For JUnit testing and other android supported libraries
     testImplementation 'junit:junit:4.12'
