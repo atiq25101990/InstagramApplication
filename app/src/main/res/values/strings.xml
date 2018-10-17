@@ -53,4 +53,14 @@
     <string name="userfeeds_fragment_text">User Feeds Fragment</string>
     <string name="edit_profile_text">Edit your Profile</string>
     <string name="photos_posted_text">Photos Posted</string>
+    <string name="photo_gallery">Gallery</string>
+    <string name="photo_camera">Camera</string>
+
+    <!-- Strings for Tab Bar -->
+    <string name="gallery">GALLERY</string>
+    <string name="photo">PHOTO</string>
+    <string name="string_open_camera">Open Camera</string>
+    <string name="string_next">Next</string>
+    <string name="img_gallery_selected_desc">Gallery Selected Img Desc</string>
+
 </resources>
