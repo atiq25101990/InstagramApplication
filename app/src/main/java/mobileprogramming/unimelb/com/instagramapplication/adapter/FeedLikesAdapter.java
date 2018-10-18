@@ -140,9 +140,6 @@ public class FeedLikesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                                         String image = task.getResult().getString("image");
                                         dataSet.get(listPosition).setProfilepic(image);
                                         Glide.with(mContext).load(object.getProfilepic()).into(imageTypeViewHolder.background);
-//                                        name = task.getResult().getString("name");
-//                                        username = task.getResult().getString("username");
-//                                        String bio = task.getResult().getString("bio");
 
                                     }
 

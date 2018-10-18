@@ -78,7 +78,7 @@ public class FeedCommentsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_feed_comments);
         ButterKnife.bind(this);
         setupToolbar();
-        userDetails=SessionManagers.getInstance().getUserDetails();
+        userDetails = SessionManagers.getInstance().getUserDetails();
         fm = getSupportFragmentManager();
         uuid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         if (getIntent() != null) {
@@ -102,13 +102,13 @@ public class FeedCommentsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (edt_comments.getText().length() > 0) {
-                    Map<String, Object> user = new HashMap<>();
-                    user.put("postid", postid);
-                    user.put("uid", uuid);
-                    user.put("text", edt_comments.getText().toString());
-                    user.put("commenttime", FieldValue.serverTimestamp());
-                    user.put("username", userDetails.get(Constant.KEY_UNAME));
-                    db.collection("comments").add(user).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    Map<String, Object> comment = new HashMap<>();
+                    comment.put("postid", postid);
+                    comment.put("uid", uuid);
+                    comment.put("text", edt_comments.getText().toString());
+                    comment.put("commenttime", FieldValue.serverTimestamp());
+                    comment.put("username", userDetails.get(Constant.KEY_UNAME));
+                    db.collection("comments").add(comment).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                         @Override
                         public void onSuccess(DocumentReference documentReference) {
                             final ModelLikes m = new ModelLikes();

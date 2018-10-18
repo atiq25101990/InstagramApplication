@@ -38,13 +38,8 @@ public class FollowerFragment extends android.support.v4.app.Fragment {
 
     CollectionReference activityRef = db.collection("activity");
 
-
-    private FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-
-    ArrayList<String> followers;
     private ArrayList<Map<String, String>> followerActivity = new ArrayList<>();
     ActivityFollowerAdapter mActivityFollowerAdapter;
-    private String uuid;
 
     public FollowerFragment() {
     }
@@ -53,7 +48,7 @@ public class FollowerFragment extends android.support.v4.app.Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView: Creating view");
-        getFollowers();
+        getFollowerActivity();
         return inflater.inflate(
                 R.layout.fragment_follower, container, false);
     }
@@ -63,7 +58,6 @@ public class FollowerFragment extends android.support.v4.app.Fragment {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
 
-        uuid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
         followerActivityRecycler.setLayoutManager(linearLayoutManager);
         mActivityFollowerAdapter = new ActivityFollowerAdapter(getActivity());
@@ -72,67 +66,29 @@ public class FollowerFragment extends android.support.v4.app.Fragment {
     }
 
 
-    /**
-     * Helper function to calculate the follower count for profile page
-     */
-    private void getFollowers() {
-        final ArrayList<String> userIDs = new ArrayList<>();
+    private void getFollowerActivity() {
+        Query query = activityRef.whereEqualTo("done_for_id", FirebaseAuth.getInstance().getCurrentUser().getUid());
 
-        // get the list of followers from collection
-        CollectionReference citiesRef = db.collection("follower");
-
-        // query all the users followed by this uuid
-        Query query = citiesRef.whereEqualTo("uid", currentUser.getUid());
-
-        // get a running sum of the number of users
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
-                    Log.d(TAG, "getFollowers: calculating the count");
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        if (task.isSuccessful()) {
-                            userIDs.add(document.getString("followerid"));
-                        }
+                    Map<String, String> instance = new HashMap<>();
+                    for (final QueryDocumentSnapshot document : task.getResult()) {
+                        instance.put("done_by_name", document.getString("done_by_name"));
+                        instance.put("done_by_id", document.getString("done_by_id"));
+                        instance.put("done_for_name", document.getString("done_for_name"));
+                        instance.put("done_for_id", document.getString("done_for_id"));
+                        instance.put("type", document.getString("type"));
+                        instance.put("post_id", document.getString("postid"));
+                        instance.put("date", String.valueOf(document.get("date")));
+                        followerActivity.add(instance);
                     }
-
-                    followers = userIDs;
-                    getFollowerActivity(followers);
-                } else {
-                    Log.d(TAG, "Error getting documents.", task.getException());
+                    mActivityFollowerAdapter.setFollowerActivity(followerActivity);
+                    mActivityFollowerAdapter.notifyDataSetChanged();
                 }
             }
-        });
-    }
-
-
-    private void getFollowerActivity(ArrayList<String> following_list) {
-        Query query;
-        for (String following : following_list) {
-            query = activityRef.whereEqualTo("done_for_id", following);
-
-            query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                    if (task.isSuccessful()) {
-                        Map<String, String> instance = new HashMap<>();
-                        for (final QueryDocumentSnapshot document : task.getResult()) {
-                            instance.put("done_by_name", document.getString("done_by_name"));
-                            instance.put("done_by_id", document.getString("done_by_id"));
-                            instance.put("done_for_name", document.getString("done_for_name"));
-                            instance.put("don_for_id", document.getString("done_for_id"));
-                            instance.put("type", document.getString("type"));
-                            instance.put("post_id", document.getString("postid"));
-                            instance.put("date", String.valueOf(document.get("date")));
-                            followerActivity.add(instance);
-                        }
-                        mActivityFollowerAdapter.setFollowerActivity(followerActivity);
-                        mActivityFollowerAdapter.notifyDataSetChanged();
-                    }
-                }
             });
-
-        }
     }
 
 }

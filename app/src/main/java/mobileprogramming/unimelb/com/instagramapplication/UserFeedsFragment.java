@@ -121,10 +121,23 @@ public class UserFeedsFragment extends Fragment {
                                 if (task.getResult().isEmpty()) {
                                     Map<String, Object> likeObject = new HashMap<>();
 
+                                    final String done_by_id = uuid;
+                                    final String done_by_name = SessionManagers.getInstance().getUserDetails().get(Constant.KEY_UNAME);
+                                    final String done_for_name = feeds.get(position).getUsername();
+                                    final String done_for_id = feeds.get(position).getUuid();
+
                                     likeObject.put("postid", feeds.get(position).getPostid());
-                                    likeObject.put("uid", feeds.get(position).getUsername());
+                                    likeObject.put("uid", feeds.get(position).getUuid());
                                     likeObject.put("username", userDetails.get(Constant.KEY_UNAME));
                                     likeObject.put("date", Calendar.getInstance().getTime());
+                                    Map<String, Object> activity = new HashMap<>();
+                                    activity.put("done_by_id",done_by_id);
+                                    activity.put("done_by_name", done_by_name);
+
+                                    activity.put("done_for_id", done_for_id);
+                                    activity.put("done_for_name", done_for_name);
+                                    activity.put("date", Calendar.getInstance().getTime());
+                                    activity.put("type", "Follow");
                                     db.collection("likes")
                                             .add(likeObject)
                                             .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
@@ -132,6 +145,15 @@ public class UserFeedsFragment extends Fragment {
                                                 public void onSuccess(DocumentReference documentReference) {
                                                     Toast.makeText(getContext(), "Liked  ", Toast.LENGTH_SHORT).show();
                                                     adapter.likeClicked(position);
+                                                }
+                                            });
+
+                                    db.collection("activity")
+                                            .add(activity)
+                                            .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                                @Override
+                                                public void onSuccess(DocumentReference documentReference) {
+                                                    Log.d(TAG, "onSuccess: activity written");
                                                 }
                                             });
                                 }

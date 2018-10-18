@@ -19,7 +19,6 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -40,6 +39,8 @@ import mobileprogramming.unimelb.com.instagramapplication.listener.RecyclerViewL
 import mobileprogramming.unimelb.com.instagramapplication.models.ModelLikes;
 import mobileprogramming.unimelb.com.instagramapplication.models.ModelUsersFollowing;
 import mobileprogramming.unimelb.com.instagramapplication.utils.CommonUtils;
+import mobileprogramming.unimelb.com.instagramapplication.utils.Constant;
+import mobileprogramming.unimelb.com.instagramapplication.utils.SessionManagers;
 
 public class FeedLikesActivity extends AppCompatActivity {
     @BindView(R.id.recyclerView)
@@ -57,6 +58,7 @@ public class FeedLikesActivity extends AppCompatActivity {
     private String postid;
     private String username;
     HashMap<String, String> userDetails = new HashMap<>();
+
     private void setupToolbar() {
 
         toolbar.setTitle("Likes");
@@ -104,18 +106,38 @@ public class FeedLikesActivity extends AppCompatActivity {
                      * Code here to follow user
                      */
 
+                    final String done_by_id = uuid;
+                    final String done_by_name = SessionManagers.getInstance().getUserDetails().get(Constant.KEY_UNAME);
+                    final String done_for_name = feeds.get(position).getUsername();
+                    final String done_for_id = feeds.get(position).getUuid();
+
                     Map<String, Object> user = new HashMap<>();
-                    user.put("followerid", uuid);
-                    user.put("uid", feeds.get(position).getUuid());
+                    user.put("followerid", done_for_id);
+                    user.put("uid", done_by_id);
                     user.put("date", Calendar.getInstance().getTime());
-                    //data2.put("regions", Arrays.asList("west_coast", "socal"));
-                    //user.put("username", feeds.get(position).getUsername());
                     db.collection("follower")
                             .add(user)
                             .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                                 @Override
                                 public void onSuccess(DocumentReference documentReference) {
                                     adapter.followed(position);
+                                    Map<String, Object> activity = new HashMap<>();
+                                    activity.put("done_by_id", done_by_id);
+                                    // galat
+                                    activity.put("done_by_name", done_by_name);
+
+                                    activity.put("done_for_id", done_for_id);
+                                    activity.put("done_for_name", done_for_name);
+                                    activity.put("date", Calendar.getInstance().getTime());
+                                    activity.put("type", "Follow");
+
+                                    db.collection("activity")
+                                            .add(activity).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<DocumentReference> task) {
+                                            Log.d(TAG, "onComplete: activity written");
+                                        }
+                                    });
                                 }
                             })
                             .addOnFailureListener(new OnFailureListener() {
@@ -131,6 +153,25 @@ public class FeedLikesActivity extends AppCompatActivity {
                     feeds.get(position).setFollwing(false);
                     adapter.notifyItemChanged(position);
                     CollectionReference citiesRef = db.collection("follower");
+                    CollectionReference activityRef = db.collection("activity");
+
+                    final Query actQuery = activityRef.whereEqualTo("done_by_id", uuid).whereEqualTo("done_for_id", feeds.get(position).getUuid());
+
+                    actQuery.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if (task.isSuccessful()) {
+                                WriteBatch batch = actQuery.getFirestore().batch();
+                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                    batch.delete(document.getReference());
+                                }
+                                batch.commit();
+                            } else {
+                                Log.d(TAG, "Error getting documents.", task.getException());
+                            }
+                        }
+                    });
+
                     final Query query = citiesRef.whereEqualTo("followerid", uuid).whereEqualTo("uid", feeds.get(position).getUuid());
                     query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                         @Override
@@ -186,8 +227,8 @@ public class FeedLikesActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             final ModelUsersFollowing m = new ModelUsersFollowing();
 
-                            m.setUuid(document.getData().get("uid").toString());
-                            m.setFollowerid(document.getData().get("followerid").toString());
+                            m.setUuid(document.getString("uid"));
+                            m.setFollowerid(document.getString("followerid"));
                             usersFollowings.add(m);
 
                         }
@@ -211,10 +252,9 @@ public class FeedLikesActivity extends AppCompatActivity {
                         for (QueryDocumentSnapshot document : task.getResult()) {
 
                             final ModelLikes m = new ModelLikes();
-                            if (document.getData().containsKey("uid"))
-                                m.setUuid(document.getData().get("uid").toString());
-                            if (document.getData().containsKey("username"))
-                                m.setUsername(document.getData().get("username").toString());
+                            m.setUuid(document.getString("uid"));
+                            m.setUsername(document.getString("username"));
+
                             for (int i = 0; i < usersFollowings.size(); i++) {
                                 if (usersFollowings.get(i).getUuid().equals(document.getData().get("uid").toString())) {
                                     m.setFollwing(true);
@@ -223,8 +263,8 @@ public class FeedLikesActivity extends AppCompatActivity {
                             }
 
                             feeds.add(m);
-                            adapter.notifyDataSetChanged();
                         }
+                        adapter.notifyDataSetChanged();
                     } catch (Exception e) {
                         Log.d(TAG, e.getMessage());
                     }

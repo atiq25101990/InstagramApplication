@@ -113,20 +113,18 @@ public class DiscoverFragment extends Fragment {
                     user.put("uid", feedsSuggest.get(position).getUuid());
                     //data2.put("regions", Arrays.asList("west_coast", "socal"));
                     //user.put("username", feeds.get(position).getUsername());
-                    db.collection("follower")
-                            .add(user)
-                            .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                                @Override
-                                public void onSuccess(DocumentReference documentReference) {
-                                    adapterSuggest.followed(position);
-                                }
-                            })
-                            .addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-
-                                }
-                            });
+                    DocumentReference dr= db.collection("follower").document();
+                    dr.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.d(TAG, "onSuccess: writing done");
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.d(TAG, "onFailure: The task failed " + e);
+                        }
+                    });
                 } else if (in == 2) {
 
                     feedsSuggest.get(position).setFollwing(false);
