@@ -122,7 +122,7 @@ public class UserFeedsFragment extends Fragment {
                                     Map<String, Object> likeObject = new HashMap<>();
 
                                     likeObject.put("postid", feeds.get(position).getPostid());
-                                    likeObject.put("uid", uuid);
+                                    likeObject.put("uid", feeds.get(position).getUsername());
                                     likeObject.put("username", userDetails.get(Constant.KEY_UNAME));
                                     likeObject.put("date", Calendar.getInstance().getTime());
                                     db.collection("likes")

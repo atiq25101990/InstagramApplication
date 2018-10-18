@@ -180,7 +180,7 @@ public class ProfileFragment extends Fragment {
         CollectionReference citiesRef = db.collection("follower");
 
         // query all the users followed by this uuid
-        Query query = citiesRef.whereEqualTo("uuid", uuid);
+        Query query = citiesRef.whereEqualTo("uid", uuid);
 
         // get a running sum of the number of users
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
