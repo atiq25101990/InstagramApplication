@@ -35,6 +35,10 @@ import com.google.firebase.firestore.WriteBatch;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
+import java.util.Collections;
+import java.util.stream.*;
+import java.util.Comparator;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -64,7 +68,10 @@ public class DiscoverFragment extends Fragment {
     private ArrayList<ModelUsers> feedsSearchResult = new ArrayList<>();
     private ArrayList<ModelUsers> feedsSearchResultSuggest = new ArrayList<>();
     private ArrayList<ModelUsersFollowing> usersFollowings = new ArrayList<>();
-    private ArrayList<ModelUsersFollowing> usersSuggested = new ArrayList<>();
+    private ArrayList<ModelUsersFollowing> myFollowers = new ArrayList<>();
+    private ArrayList<ModelUsers> allUsers = new ArrayList<>();
+    public HashMap<String,ModelUsers> allUsersHash = new HashMap<>();
+    public HashMap<String,Integer> followersOfFollersOccurences = new HashMap<>();
     private View view;
     private RecyclerViewLoadMoreScroll scrollListener;
     private FragmentManager fm;
@@ -241,7 +248,10 @@ public class DiscoverFragment extends Fragment {
         feeds.clear();
         feedsSuggest.clear();
         usersFollowings.clear();
-        usersSuggested.clear();
+        myFollowers.clear();
+        allUsers.clear();
+        //followersOfFollersOccurences.clear();
+        //allUsersHash.clear();
         feedsSearchResult.clear();
         feedsSearchResultSuggest.clear();
         //Resume user suggestion from here...
@@ -376,18 +386,20 @@ public class DiscoverFragment extends Fragment {
                             final ModelUsersFollowing m = new ModelUsersFollowing();
                             m.setUuid(document.getData().get("uid").toString());
                             m.setFollowerid(document.getData().get("followerid").toString());
-                            usersSuggested.add(m);
+                            myFollowers.add(m);
+                            //All of my followers getched up till here.
                         }
                     }
                 }
-                getUsersSuggested();
+                //Initiate get all users from server.
+                getAllUsers();
             }
         });
 
 
     }
 
-    private void getUsersSuggested() {
+    private void getAllUsers() {
 
         CollectionReference citiesRef = db.collection("Users");
         Query query = citiesRef.orderBy("username").limit(200);
@@ -404,44 +416,95 @@ public class DiscoverFragment extends Fragment {
                             m.setUuid(document.getId());
                             m.setUsername(document.getData().get("username").toString());
                             m.setImage(document.getData().get("image").toString());
-                            boolean doesUserFollowThisUser = false;
-                            for (int i = 0; i < usersSuggested.size(); i++) {
-                                if (usersSuggested.get(i).getUuid().equals(document.getId())) {
-                                    m.setFollwing(true);
-                                    doesUserFollowThisUser = true;
-
-                                    //Checking only for users that this user does follows -u.
-
-                                    /**Add suggestions based on algorithm here
-                                     * Any users added here will not show up
-                                     * in search list, as per instagram's orignal
-                                     * behaviour. --(M. Umair)
-                                     */
-                                    if(uuid.equals(m.getUuid()))
-                                    {
-                                        continue;
-                                    }
-                                    //TODO-Implement suggestionalgohere.All else ready
-                                    //ArrayList<ModelUsers> thisFeedIn = new ArrayList<>();
-                                    //thisFeedIn = suggestionAlgorithm(m.getUuid());
-                                    //Log.d("SuggestionSize*------>",Integer.toString(feedsSuggest.size()));
-                                    feedsSuggest.add(m);
-                                    break;
-                                }
-                            }
+                            Log.d("Sequence","S1");
+                            allUsers.add(m);
+                            allUsersHash.put(document.getId(),m);
                         }
 
                     }
 
-                    feedsSearchResultSuggest.addAll(feedsSuggest);
-                    adapterSuggest.notifyDataSetChanged();
-                } else {
+                    //feedsSearchResultSuggest.addAll(feedsSuggest);
+                    //adapterSuggest.notifyDataSetChanged();
+                }
+                else {
                     Log.d(TAG, "Error getting documents.", task.getException());
                 }
+
+                /**This will be called after getting allUsers and all followers now (myFollowers).
+                 * i.e. get all followers of followers, increment count if repeats,
+                 * and then filter those users.
+                 */
+
+                getFollowersOfFollowers();
 
             }
         });
 
+
+    }
+
+    private void getFollowersOfFollowers()
+    {
+        //Get followers of follwers and add them in hashmap.
+
+        for (int i=0; i<myFollowers.size(); i++)
+        {
+            CollectionReference citiesRef = db.collection("follower");
+            Query query = citiesRef.whereEqualTo("followerid", myFollowers.get(i).getUuid()).limit(100);
+            //Query query = citiesRef.whereGreaterThan("followerid",uuid);
+            query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            if (task.isSuccessful()) {
+                                String keyFollwingId = document.getData().get("uid").toString();
+                                String keyFollwerId = document.getData().get("followerid").toString();
+
+                                if (followersOfFollersOccurences.containsKey(keyFollwingId))
+                                {
+                                    //Increment count by one on this key.
+                                    followersOfFollersOccurences.put(keyFollwingId, followersOfFollersOccurences.get(keyFollwingId) + 1);
+                                }
+                                else
+                                {
+                                    //Else just add this foller of follower as is an instantiat the count to 1.
+                                    followersOfFollersOccurences.put(keyFollwingId, 1);
+                                }
+                            }
+                        }
+                    }
+                    //Do something after iterating this user's followers. For now move to the next one.
+                }
+            });
+        }
+
+        /** User's followers of follower's hasmap created
+         * along with number of times a user was followed.
+         */
+
+        Map<String,Integer> sorted = sortByValues(followersOfFollersOccurences);
+        //Only add top 5 most followed users followed by the followers of a user.
+        int topFiveCount=0;
+        for (Map.Entry<String, Integer> entry : sorted.entrySet()) {
+            String userID = entry.getKey();
+            Integer occurrences = entry.getValue();
+            if(topFiveCount==5)
+            {
+                break;
+            }
+            else
+            {
+                feedsSuggest.add(allUsersHash.get(userID));
+            }
+            topFiveCount++;
+            Log.d("Hash: ","UserID: "+userID+" | Number of times followed: "+occurrences);
+            // ...
+        }
+
+        feedsSearchResultSuggest.addAll(feedsSuggest);
+         adapterSuggest.notifyDataSetChanged();
 
     }
 
@@ -514,5 +577,18 @@ public class DiscoverFragment extends Fragment {
 
     }
 
+
+    public static <K, V extends Comparable<V>> Map<K, V> sortByValues(final Map<K, V> map) {
+        Comparator<K> valueComparator =  new Comparator<K>() {
+            public int compare(K k1, K k2) {
+                int compare = map.get(k2).compareTo(map.get(k1));
+                if (compare == 0) return 1;
+                else return compare;
+            }
+        };
+        Map<K, V> sortedByValues = new TreeMap<K, V>(valueComparator);
+        sortedByValues.putAll(map);
+        return sortedByValues;
+    }
 
 }
