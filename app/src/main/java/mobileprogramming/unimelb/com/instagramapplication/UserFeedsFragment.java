@@ -58,6 +58,10 @@ public class UserFeedsFragment extends Fragment {
     Query first;
     @BindView(R.id.fab_sort)
     FloatingActionButton fab_sort;
+
+    @BindView(R.id.animateChangesLayout)
+    View animateChangesView;
+
     private FeedAdapter adapter;
     private ArrayList<Model> feeds = new ArrayList<>();
     private ArrayList<ModelUsersFollowing> usersFollowings = new ArrayList<>();
@@ -237,7 +241,6 @@ public class UserFeedsFragment extends Fragment {
                 if (task.isSuccessful()) {
 
                     for (final QueryDocumentSnapshot document : task.getResult()) {
-                        CommonUtils.dismissProgressDialog();
                         if (task.isSuccessful()) {
                             final Model m = new Model();
                             m.setPostid(document.getId());
@@ -255,6 +258,8 @@ public class UserFeedsFragment extends Fragment {
                             }
 
                             adapter.notifyDataSetChanged();
+                            CommonUtils.dismissProgressDialog();
+                            animateChangesView.setVisibility(View.GONE);
                         }
                     }
                 } else {
