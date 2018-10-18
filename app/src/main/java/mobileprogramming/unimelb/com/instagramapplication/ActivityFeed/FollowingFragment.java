@@ -29,6 +29,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import mobileprogramming.unimelb.com.instagramapplication.R;
 import mobileprogramming.unimelb.com.instagramapplication.adapter.ActivityFollowingAdapter;
+import mobileprogramming.unimelb.com.instagramapplication.models.ModelActivity;
 
 public class FollowingFragment extends android.support.v4.app.Fragment {
     private static final String TAG = "FollowingFragment";
@@ -38,7 +39,7 @@ public class FollowingFragment extends android.support.v4.app.Fragment {
 
     CollectionReference activityRef = db.collection("activity");
 
-    private LinkedHashSet<Map<String, String>> followingActivity = new LinkedHashSet<>();
+    private LinkedHashSet<ModelActivity> followingActivity = new LinkedHashSet<>();
     ActivityFollowingAdapter mActivityFollowingAdapter;
 
     public FollowingFragment() {
@@ -74,16 +75,16 @@ public class FollowingFragment extends android.support.v4.app.Fragment {
                 @Override
                 public void onComplete(@NonNull Task<QuerySnapshot> task) {
                     if (task.isSuccessful()) {
-                        Map<String, String> instance = new HashMap<>();
+                        ModelActivity modelActivity = new ModelActivity();
                         for (final QueryDocumentSnapshot document : task.getResult()) {
-                            instance.put("done_by_name", document.getString("done_by_name"));
-                            instance.put("done_by_id", document.getString("done_by_id"));
-                            instance.put("done_for_name", document.getString("done_for_name"));
-                            instance.put("done_for_id", document.getString("done_for_id"));
-                            instance.put("type", document.getString("type"));
-                            instance.put("post_id", document.getString("postid"));
-                            instance.put("date", String.valueOf(document.get("date")));
-                            followingActivity.add(instance);
+                            modelActivity.setDoneByName(document.getString("done_by_name"));
+                            modelActivity.setDoneByID(document.getString("done_by_id"));
+                            modelActivity.setDoneForName(document.getString("done_for_name"));
+                            modelActivity.setDoneForID(document.getString("done_for_id"));
+                            modelActivity.setType(document.getString("type"));
+                            modelActivity.setPostid(document.getString("postid"));
+                            modelActivity.setDate(String.valueOf(document.get("date")));
+                            followingActivity.add(modelActivity);
                         }
                         mActivityFollowingAdapter.setFollowingActivity(followingActivity);
                         mActivityFollowingAdapter.notifyDataSetChanged();

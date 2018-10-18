@@ -196,18 +196,6 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
                         }
                     });
-                    imageTypeViewHolder.txt_comments.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-
-                            Intent intent = new Intent(mContext, FeedCommentsActivity.class);
-                            intent.putExtra("postid", object.getPostid());
-                            intent.putExtra("username", object.getUsername());
-                            mContext.startActivity(intent);
-
-
-                        }
-                    });
 
                     Glide.with(mContext).load(object.getImage()).into(imageTypeViewHolder.post_image);
                     if (object.getProfilepic()==null) {
@@ -219,9 +207,6 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                                         String image = task.getResult().getString("image");
                                         dataSet.get(listPosition).setProfilepic(image);
                                         Glide.with(mContext).load(object.getProfilepic()).into(imageTypeViewHolder.background);
-//                                        name = task.getResult().getString("name");
-//                                        username = task.getResult().getString("username");
-//                                        String bio = task.getResult().getString("bio");
 
                                     }
 
@@ -238,12 +223,20 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
                         }
                     });
-                    imageTypeViewHolder.btnOption.setOnClickListener(new View.OnClickListener() {
+
+                    imageTypeViewHolder.txt_comments.setOnClickListener(new View.OnClickListener() {
                         @Override
-                        public void onClick(View view) {
-                            onItemClickListener.onItemClick(listPosition, 2);
+                        public void onClick(View v) {
+
+                            Intent intent = new Intent(mContext, FeedCommentsActivity.class);
+                            intent.putExtra("postid", object.getPostid());
+                            intent.putExtra("username", object.getUsername());
+                            mContext.startActivity(intent);
+
+
                         }
                     });
+
 
                     CollectionReference citiesRef = FirebaseFirestore.getInstance().collection("likes");
                     Query query = citiesRef.whereEqualTo("postid", object.getPostid());
@@ -278,10 +271,9 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         TextView txt_likes;
         CircleImageView background;
         TextView txt_username;
-        TextView txt_comments;
+        ImageView txt_comments;
         TextView txt_date;
         ImageView btn_like;
-        ImageButton btnOption;
         String uid;
 
 
@@ -292,9 +284,8 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             txt_likes = itemView.findViewById(R.id.txt_likes);
             txt_date = itemView.findViewById(R.id.txt_date);
             txt_username = itemView.findViewById(R.id.txt_username);
-            txt_comments = itemView.findViewById(R.id.txt_comments);
             btn_like = itemView.findViewById(R.id.btn_like);
-            btnOption = itemView.findViewById(R.id.btn_option);
+            txt_comments = itemView.findViewById(R.id.button_comment);
         }
 
     }

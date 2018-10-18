@@ -16,14 +16,12 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Set;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import mobileprogramming.unimelb.com.instagramapplication.R;
+import mobileprogramming.unimelb.com.instagramapplication.models.ModelActivity;
 
 public class ActivityFollowingAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -35,11 +33,11 @@ public class ActivityFollowingAdapter extends RecyclerView.Adapter<RecyclerView.
         mContext = context;
     }
 
-    public void setFollowingActivity(LinkedHashSet<Map<String, String>> followingActivity) {
+    public void setFollowingActivity(LinkedHashSet<ModelActivity> followingActivity) {
         this.followingActivity = followingActivity;
     }
 
-    private LinkedHashSet<Map<String, String>> followingActivity = new LinkedHashSet<>();
+    private LinkedHashSet<ModelActivity> followingActivity = new LinkedHashSet<>();
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -49,30 +47,30 @@ public class ActivityFollowingAdapter extends RecyclerView.Adapter<RecyclerView.
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        Map<String, String> item = (Map<String, String>) followingActivity.toArray()[position];
-        getUserPhoto(item.get("done_by_id"), ((ActivityFollowingAdapter.FeedViewHolder) holder).feedUserImage);
+        ModelActivity item = (ModelActivity) followingActivity.toArray()[position];
+        getUserPhoto(item.getDoneByID(), ((ActivityFollowingAdapter.FeedViewHolder) holder).feedUserImage);
 
 
         String feedText;
-        switch (item.get("type")){
+        switch (item.getType()){
             case "Like":
-                feedText = item.get("done_by_name") + " liked " + item.get("done_for_name") + "'s post.";
+                feedText = item.getDoneByName() + " liked " + item.getDoneForName() + "'s post.";
                 break;
             case "Comment":
-                feedText = item.get("done_by_name") + " commented on " + item.get("done_for_name") + "'s post.";
+                feedText = item.getDoneByName() + " commented on " + item.getDoneForName() + "'s post.";
                 break;
             case "Follow":
-                feedText = item.get("done_by_name") + " started following " + item.get("done_for_name") + ".";
+                feedText = item.getDoneByName() + " started following " + item.getDoneForName() + ".";
                 break;
             default:
-                feedText = item.get("done_by_name") + " interacted with " + item.get("done_for_name") + ".";
+                feedText = item.getDoneByName() + " interacted with " + item.getDoneForName() + ".";
                 break;
         }
 
         ((ActivityFollowingAdapter.FeedViewHolder) holder).feedText.setText(feedText);
 
-        if(item.containsKey("postid")){
-            getPostURL(item.get("postid"), ((ActivityFollowingAdapter.FeedViewHolder) holder).feedPostImage);
+        if(item.getPostid()!=null){
+            getPostURL(item.getPostid(), ((ActivityFollowingAdapter.FeedViewHolder) holder).feedPostImage);
         }
     }
 

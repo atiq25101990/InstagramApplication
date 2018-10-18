@@ -28,6 +28,7 @@ import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import mobileprogramming.unimelb.com.instagramapplication.models.ModelActivity;
 
 
 /**
@@ -47,7 +48,7 @@ public class ActivityFeedsFragment extends Fragment {
     private FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
     private ArrayList<String> following;
     ArrayList<String> followers;
-    private ArrayList<Map<String, String>> followerActivity = new ArrayList<>();
+    private ArrayList<ModelActivity> followerActivity = new ArrayList<>();
     private ArrayList<Map<String, String>> followingActivity = new ArrayList<>();
 
     public ActivityFeedsFragment() {
@@ -100,7 +101,7 @@ public class ActivityFeedsFragment extends Fragment {
                             instance.put("done_by_name", document.getString("done_by_name"));
                             instance.put("done_for_name", document.getString("done_for_name"));
                             instance.put("type", document.getString("type"));
-                            instance.put("post_id", document.getString("postid"));
+                            instance.put("postid", document.getString("postid"));
                             instance.put("date", document.getString("date"));
                             followingActivity.add(instance);
                         }
@@ -122,14 +123,14 @@ public class ActivityFeedsFragment extends Fragment {
                 @Override
                 public void onComplete(@NonNull Task<QuerySnapshot> task) {
                     if (task.isSuccessful()) {
-                        Map<String, String> instance = new HashMap<>();
+                        ModelActivity modelActivity = new ModelActivity();
                         for (final QueryDocumentSnapshot document : task.getResult()) {
-                            instance.put("done_by_name", document.getString("done_by_name"));
-                            instance.put("done_for_name", document.getString("done_for_name"));
-                            instance.put("type", document.getString("type"));
-                            instance.put("post_id", document.getString("postid"));
-                            instance.put("date", document.getString("date"));
-                            followerActivity.add(instance);
+                            modelActivity.setDoneByName(document.getString("done_by_name"));
+                            modelActivity.setDoneForName(document.getString("done_for_name"));
+                            modelActivity.setType(document.getString("type"));
+                            modelActivity.setPostid(document.getString("postid"));
+                            modelActivity.setDate(String.valueOf(document.getData().get("date")));
+                            followerActivity.add(modelActivity);
                         }
 
                     }

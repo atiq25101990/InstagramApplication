@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -22,12 +21,15 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import mobileprogramming.unimelb.com.instagramapplication.R;
 import mobileprogramming.unimelb.com.instagramapplication.adapter.ActivityFollowerAdapter;
+import mobileprogramming.unimelb.com.instagramapplication.models.ModelActivity;
 
 public class FollowerFragment extends android.support.v4.app.Fragment {
 
@@ -38,7 +40,7 @@ public class FollowerFragment extends android.support.v4.app.Fragment {
 
     CollectionReference activityRef = db.collection("activity");
 
-    private ArrayList<Map<String, String>> followerActivity = new ArrayList<>();
+    private LinkedHashSet<ModelActivity> followerActivity = new LinkedHashSet<>();
     ActivityFollowerAdapter mActivityFollowerAdapter;
 
     public FollowerFragment() {
@@ -73,22 +75,22 @@ public class FollowerFragment extends android.support.v4.app.Fragment {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
-                    Map<String, String> instance = new HashMap<>();
+                    ModelActivity modelActivity = new ModelActivity();
                     for (final QueryDocumentSnapshot document : task.getResult()) {
-                        instance.put("done_by_name", document.getString("done_by_name"));
-                        instance.put("done_by_id", document.getString("done_by_id"));
-                        instance.put("done_for_name", document.getString("done_for_name"));
-                        instance.put("done_for_id", document.getString("done_for_id"));
-                        instance.put("type", document.getString("type"));
-                        instance.put("post_id", document.getString("postid"));
-                        instance.put("date", String.valueOf(document.get("date")));
-                        followerActivity.add(instance);
+                        modelActivity.setDoneByName(document.getString("done_by_name"));
+                        modelActivity.setDoneForName(document.getString("done_for_name"));
+                        modelActivity.setDoneForID(document.getString("done_for_id"));
+                        modelActivity.setDoneByID(document.getString("done_by_id"));
+                        modelActivity.setType(document.getString("type"));
+                        modelActivity.setPostid(document.getString("postid"));
+                        modelActivity.setDate(String.valueOf(document.getData().get("date")));
+                        followerActivity.add(modelActivity);
                     }
                     mActivityFollowerAdapter.setFollowerActivity(followerActivity);
                     mActivityFollowerAdapter.notifyDataSetChanged();
                 }
             }
-            });
+        });
     }
 
 }

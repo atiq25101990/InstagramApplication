@@ -134,7 +134,7 @@ public class UserFeedsFragment extends Fragment {
                                     activity.put("done_by_id",done_by_id);
                                     activity.put("done_by_name", done_by_name);
 
-                                    activity.put("done_for_id", done_for_id);
+                                    activity.put("done_for_id", feeds.get(position).getUuid());
                                     activity.put("done_for_name", done_for_name);
                                     activity.put("date", Calendar.getInstance().getTime());
                                     activity.put("type", "Follow");
