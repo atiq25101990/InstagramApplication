@@ -28,7 +28,6 @@ import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import mobileprogramming.unimelb.com.instagramapplication.adapter.ActivityFeedAdapter;
 
 
 /**
@@ -44,7 +43,6 @@ public class ActivityFeedsFragment extends Fragment {
 
     CollectionReference activityRef = db.collection("activity");
 
-    ActivityFeedAdapter mActivityFeedAdapter;
     private String uuid;
     private FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
     private ArrayList<String> following;
@@ -73,8 +71,8 @@ public class ActivityFeedsFragment extends Fragment {
         uuid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
         activityFeedRecyclerView.setLayoutManager(linearLayoutManager);
-        mActivityFeedAdapter = new ActivityFeedAdapter(getActivity());
-        activityFeedRecyclerView.setAdapter(mActivityFeedAdapter);
+//        mActivityFeedAdapter = new ActivityFeedAdapter(getActivity());
+//        activityFeedRecyclerView.setAdapter(mActivityFeedAdapter);
 
 
         getActivityFeed();
@@ -141,44 +139,11 @@ public class ActivityFeedsFragment extends Fragment {
         }
     }
 
-//    private HashMap<String, HashMap<String, String>> getFollowersActivity(ArrayList<String> followers) {
-//        // get all likes on current user's photos
-//        Query likesQuery = likesRef.whereEqualTo("uid", currentUser.getUid());
-//        Query followQuery = followRef.whereEqualTo("followerid", currentUser.getUid());
-//        Query postQuery = postRef.whereEqualTo("uid", currentUser.getUid());
-//        ArrayList<String> postIDs = new ArrayList<>();
-//        final HashMap<String, HashMap<String, String>> followerActivity = new HashMap<>();
-//
-//        likesQuery.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-//            @Override
-//            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-//                if(task.isSuccessful()){
-//                    for (final QueryDocumentSnapshot document : task.getResult()) {
-//                            followerActivity.put(document.getString("username"), new HashMap<String, String>(){{put("Like", document.getString("postid"));}});
-//                    }
-//                }
-//            }
-//        });
-//
-//        followQuery.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-//            @Override
-//            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-//                if(task.isSuccessful()){
-//                    for (final QueryDocumentSnapshot document : task.getResult()) {
-//                        followerActivity.put(document.getString("uid"), new HashMap<String, String>(){{put("Follow", "");}});
-//                    }
-//                }
-//            }
-//        });
-//
-//        return followerActivity;
-//    }
-
 
     /**
      * Helper function to calculate the follower count for profile page
      */
-    private ArrayList<String> getFollowers() {
+    private void getFollowers() {
         final ArrayList<String> userIDs = new ArrayList<>();
 
         // get the list of followers from collection
@@ -206,7 +171,6 @@ public class ActivityFeedsFragment extends Fragment {
                 }
             }
         });
-        return userIDs;
     }
 
     /**

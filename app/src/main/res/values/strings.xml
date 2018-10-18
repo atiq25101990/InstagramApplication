@@ -62,5 +62,6 @@
     <string name="string_next">Next</string>
     <string name="img_gallery_selected_desc">Gallery Selected Img Desc</string>
     <string name="string_open_camera">Open Camera</string>
+    <string name="post_image">Post image</string>
 
 </resources>

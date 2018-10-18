@@ -25,6 +25,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import java.util.HashMap;
 import java.util.List;
 
+import mobileprogramming.unimelb.com.instagramapplication.ActivityFeed.ActivityFeed;
 import mobileprogramming.unimelb.com.instagramapplication.Share.PhotoFragment;
 import mobileprogramming.unimelb.com.instagramapplication.Share.ShareActivity;
 import mobileprogramming.unimelb.com.instagramapplication.utils.CommonUtils;
@@ -44,6 +45,13 @@ public class MainActivity extends AppCompatActivity {
     private ProfileFragment profileFragment;
     private FirebaseFirestore mFirestore;
     private String user_id;
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setBottomNavigationView();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -130,7 +138,8 @@ public class MainActivity extends AppCompatActivity {
                         return true;
 
                     case R.id.nav_activityfeeds:
-                        setFragment(activityFeedsFragment);
+                        Intent activityFeedIntent = new Intent(MainActivity.this, ActivityFeed.class);
+                        startActivity(activityFeedIntent);
                         return true;
 
                     case R.id.nav_profile:
