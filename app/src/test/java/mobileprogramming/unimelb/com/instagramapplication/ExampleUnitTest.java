@@ -11,7 +11,7 @@ import static org.junit.Assert.*;
  */
 public class ExampleUnitTest {
     @Test
-//Testing git from unimelb
+//Testing git from unimelb to get in sync-uj
     public void addition_isCorrect() {
         assertEquals(4, 2 + 2);
     }
