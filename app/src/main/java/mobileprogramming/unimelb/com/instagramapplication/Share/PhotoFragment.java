@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.CircularProgressDrawable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,7 +31,6 @@ public class PhotoFragment extends Fragment{
     private static final int PHOTO_FRAGMENT_NUM = 1;
     private static final int GALLERY_FRAGMENT_NUM = 2;
     private static final int CAMERA_REQUEST_CODE = 5;
-
 
     public PhotoFragment() {
         // Required empty public constructor

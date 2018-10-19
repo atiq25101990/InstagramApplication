@@ -93,7 +93,7 @@ public class Photo {
     public String toString() {
         return "Photo{" +
                 "caption='" + caption + '\'' +
-                ", date_created='" + date_created + '\'' +
+                ", date='" + date_created + '\'' +
                 ", image='" + image + '\'' +
                 ", photo_id='" + photo_id + '\'' +
                 ", uid='" + uid + '\'' +

@@ -6,8 +6,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.provider.Settings;
-
-
+import android.support.v4.widget.CircularProgressDrawable;
 
 
 import java.util.regex.Matcher;

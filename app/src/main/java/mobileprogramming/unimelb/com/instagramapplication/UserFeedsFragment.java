@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.OrientationHelper;
@@ -69,6 +70,10 @@ public class UserFeedsFragment extends Fragment {
     private RecyclerViewLoadMoreScroll scrollListener;
     private FragmentManager fm;
 
+
+    @BindView(R.id.swipeRefresh)
+    SwipeRefreshLayout mSwipeRefreshLayout;
+
     public String getTAG() {
         return TAG;
     }
@@ -94,13 +99,21 @@ public class UserFeedsFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
 
         CommonUtils.showLoadingDialog(getContext());
         uuid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                feeds.clear();
+                usersFollowings.clear();
+                getFollowingUsers();
+            }
+        });
         userDetails = SessionManagers.getInstance().getUserDetails();
         recyclerView.setHasFixedSize(true);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), OrientationHelper.VERTICAL, false);
@@ -239,6 +252,7 @@ public class UserFeedsFragment extends Fragment {
                     }
                     getFeeds(0);
 
+
                 } else {
                     Log.d(TAG, "Error getting documents.", task.getException());
                 }
@@ -288,6 +302,8 @@ public class UserFeedsFragment extends Fragment {
 
                             adapter.notifyDataSetChanged();
                             CommonUtils.dismissProgressDialog();
+                            if (mSwipeRefreshLayout.isRefreshing())
+                                mSwipeRefreshLayout.setRefreshing(false);
                             animateChangesView.setVisibility(View.GONE);
                         }
                     }
