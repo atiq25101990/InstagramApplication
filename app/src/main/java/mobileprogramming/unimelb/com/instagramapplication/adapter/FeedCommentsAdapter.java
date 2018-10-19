@@ -30,7 +30,7 @@ public class FeedCommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     AppCompatActivity mContext;
     int total_types;
     private OnItemClickListener onItemClickListener;
-    private ArrayList<ModelLikes> dataSet;
+    private ArrayList<ModelLikes> dataSet = new ArrayList<>();
 
     public FeedCommentsAdapter(AppCompatActivity context, ArrayList<ModelLikes> data) {
         this.dataSet = data;

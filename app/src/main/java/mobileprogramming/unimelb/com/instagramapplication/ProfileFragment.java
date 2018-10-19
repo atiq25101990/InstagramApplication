@@ -17,7 +17,6 @@ import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -35,7 +34,6 @@ import butterknife.ButterKnife;
 import de.hdodenhof.circleimageview.CircleImageView;
 import mobileprogramming.unimelb.com.instagramapplication.adapter.ProfileImageAdapter;
 import mobileprogramming.unimelb.com.instagramapplication.utils.CommonUtils;
-import mobileprogramming.unimelb.com.instagramapplication.utils.SessionManagers;
 
 
 /**
@@ -44,7 +42,6 @@ import mobileprogramming.unimelb.com.instagramapplication.utils.SessionManagers;
 public class ProfileFragment extends Fragment {
 
     private static final String TAG = "ProfileFragment";
-    private HashMap<String, String> userDetails;
     private String uuid;
 
     @BindView(R.id.profileCircularPicture)
@@ -72,10 +69,16 @@ public class ProfileFragment extends Fragment {
     private int mFollowingCount;
     private int mPostCount;
     private ArrayList<String> urlList = new ArrayList<>();
+    private String imageURL;
+    private HashMap<String, String> profileUser;
 
 
     public ProfileFragment() {
         // Required empty public constructor
+    }
+
+    public static ProfileFragment newInstance() {
+        return new ProfileFragment();
     }
 
 
@@ -101,6 +104,7 @@ public class ProfileFragment extends Fragment {
         // Getting user details from Firebase
         currentUserID = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
+        setProfilePicture();
         if (!uuid.equals(currentUserID)){
             if(getArguments().getBoolean("followed")){
                 textViewEditProfile.setText("Unfollow");
@@ -111,11 +115,10 @@ public class ProfileFragment extends Fragment {
         Log.d(TAG, "onViewCreated: The username is " + uuid);
 
         CommonUtils.showLoadingDialog(getContext());
-        getPostedImages();
         getFollowingCount();
         getFollowerCount();
-        setProfilePicture();
         getPostCount();
+        getPostedImages();
 
     }
 
@@ -127,9 +130,13 @@ public class ProfileFragment extends Fragment {
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
+                    profileUser = new HashMap<>();
                     if (document.exists()) {
-                        profileUserName.setText(String.valueOf(document.getString("username")));
-                        profileDisplayName.setText(String.valueOf(document.getString("name")));
+                        profileUser.put("username", document.getString("username"));
+                        profileUser.put("imageURL", document.getString("image"));
+
+                        profileUserName.setText(profileUser.get("username"));
+                        profileDisplayName.setText(profileUser.get("name"));
                         Glide.with(getContext()).load(document.getString("image")).into(profileCircularPicture);
                     } else {
                         Log.d(TAG, "onComplete: Failed to get document");
@@ -164,7 +171,7 @@ public class ProfileFragment extends Fragment {
     }
 
     private void setPostedImages() {
-        ProfileImageAdapter profileImageAdapter = new ProfileImageAdapter(getContext());
+        ProfileImageAdapter profileImageAdapter = new ProfileImageAdapter(getContext(), profileUser);
         profileImageAdapter.setUrlList(urlList);
         profileImageAdapter.notifyDataSetChanged();
         profilePictureGrid.setAdapter(profileImageAdapter);
@@ -255,6 +262,4 @@ public class ProfileFragment extends Fragment {
         });
 
     }
-
-
 }

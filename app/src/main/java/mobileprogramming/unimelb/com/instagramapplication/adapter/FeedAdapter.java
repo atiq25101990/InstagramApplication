@@ -197,6 +197,7 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                         }
                     });
 
+
                     Glide.with(mContext).load(object.getImage()).into(imageTypeViewHolder.post_image);
                     if (object.getProfilepic()==null) {
                         FirebaseFirestore.getInstance().collection("Users").document(object.getUuid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
