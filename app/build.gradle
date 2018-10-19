@@ -45,7 +45,10 @@ dependencies {
     implementation "com.android.support:recyclerview-v7:27.0.2"
     //Cardview
     implementation 'com.android.support:cardview-v7:27+'//Universal image loader
+    //Universal Image Loader
     implementation 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
+    //Google location and activity recognition
+    implementation 'com.google.android.gms:play-services-location:15.0.0'
     //For JUnit testing and other android supported libraries
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
