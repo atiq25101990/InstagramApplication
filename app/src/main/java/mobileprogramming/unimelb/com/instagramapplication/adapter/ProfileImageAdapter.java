@@ -1,6 +1,7 @@
 package mobileprogramming.unimelb.com.instagramapplication.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,8 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
+
+import mobileprogramming.unimelb.com.instagramapplication.PostActivity;
 
 public class ProfileImageAdapter extends BaseAdapter {
     private Context mContext;
@@ -48,10 +51,18 @@ public class ProfileImageAdapter extends BaseAdapter {
             // if it's not recycled, initialize some attributes
             imageView = new ImageView(mContext);
             Glide.with(mContext).load(urlList.get(position)).into(imageView);
-
+            final int pos = position;
             imageView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, 300));
-
             imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+
+            imageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(mContext, PostActivity.class);
+                    intent.putExtra("postid", urlList.get(pos));
+                    mContext.startActivity(intent);
+                }
+            });
             imageView.setPadding(4, 4, 4, 4);
         } else {
             imageView = (ImageView) convertView;

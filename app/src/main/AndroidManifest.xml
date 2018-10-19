@@ -40,7 +40,8 @@
             android:theme="@style/Base.Theme.AppCompat" />
         <activity android:name=".FeedLikesActivity" />
         <activity android:name=".FeedCommentsActivity" />
-        <activity android:name=".ActivityFeed.ActivityFeed"></activity>
+        <activity android:name=".ActivityFeed.ActivityFeed" />
+        <activity android:name=".PostActivity"></activity>
     </application>
 
 </manifest>

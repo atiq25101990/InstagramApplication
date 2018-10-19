@@ -17,7 +17,6 @@ import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -35,7 +34,6 @@ import butterknife.ButterKnife;
 import de.hdodenhof.circleimageview.CircleImageView;
 import mobileprogramming.unimelb.com.instagramapplication.adapter.ProfileImageAdapter;
 import mobileprogramming.unimelb.com.instagramapplication.utils.CommonUtils;
-import mobileprogramming.unimelb.com.instagramapplication.utils.SessionManagers;
 
 
 /**
@@ -255,6 +253,4 @@ public class ProfileFragment extends Fragment {
         });
 
     }
-
-
 }

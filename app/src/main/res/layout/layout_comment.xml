@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp"
+    android:orientation="horizontal">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:id="@+id/commentUserPicture"
+        android:layout_height="40dp" />
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_weight="5"
+        android:id="@+id/commentText"
+        android:layout_height="wrap_content" />
+</LinearLayout>
