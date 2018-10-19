@@ -35,10 +35,8 @@ import com.google.firebase.firestore.WriteBatch;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
-import java.util.Collections;
-import java.util.stream.*;
 import java.util.Comparator;
+import java.util.TreeMap;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -72,6 +70,7 @@ public class DiscoverFragment extends Fragment {
     private ArrayList<ModelUsers> allUsers = new ArrayList<>();
     public HashMap<String,ModelUsers> allUsersHash = new HashMap<>();
     public HashMap<String,Integer> followersOfFollersOccurences = new HashMap<>();
+    public HashMap<String,String> myFollowersHah = new HashMap<>();
     private View view;
     private RecyclerViewLoadMoreScroll scrollListener;
     private FragmentManager fm;
@@ -120,18 +119,20 @@ public class DiscoverFragment extends Fragment {
                     user.put("uid", feedsSuggest.get(position).getUuid());
                     //data2.put("regions", Arrays.asList("west_coast", "socal"));
                     //user.put("username", feeds.get(position).getUsername());
-                    DocumentReference dr= db.collection("follower").document();
-                    dr.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Log.d(TAG, "onSuccess: writing done");
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.d(TAG, "onFailure: The task failed " + e);
-                        }
-                    });
+                    db.collection("follower")
+                            .add(user)
+                            .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                @Override
+                                public void onSuccess(DocumentReference documentReference) {
+                                    adapterSuggest.followed(position);
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+
+                                }
+                            });
                 } else if (in == 2) {
 
                     feedsSuggest.get(position).setFollwing(false);
@@ -249,14 +250,14 @@ public class DiscoverFragment extends Fragment {
         feedsSuggest.clear();
         usersFollowings.clear();
         myFollowers.clear();
-        allUsers.clear();
-        //followersOfFollersOccurences.clear();
-        //allUsersHash.clear();
+        followersOfFollersOccurences.clear();
+        myFollowersHah.clear();;
         feedsSearchResult.clear();
         feedsSearchResultSuggest.clear();
-        //Resume user suggestion from here...
+        //Resume user suggestion from here..
         getFollowingUserssuggestions();
         getFollowingUsers();
+
 
         edt_search.addTextChangedListener(new TextWatcher() {
             @Override
@@ -387,17 +388,76 @@ public class DiscoverFragment extends Fragment {
                             m.setUuid(document.getData().get("uid").toString());
                             m.setFollowerid(document.getData().get("followerid").toString());
                             myFollowers.add(m);
-                            //All of my followers getched up till here.
+                            myFollowersHah.put(document.getData().get("uid").toString(),uuid);
                         }
                     }
                 }
-                //Initiate get all users from server.
+
                 getAllUsers();
+                //getUsersSuggested();
+            }
+        });
+    }
+
+
+    private void getUsersSuggested() {
+
+        CollectionReference citiesRef = db.collection("Users");
+        Query query = citiesRef.orderBy("username").limit(200);
+
+        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                //CommonUtils.dismissProgressDialog();
+                if (task.isSuccessful()) {
+                    int someCount= 0;
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        if (task.isSuccessful()) {
+                            final ModelUsers m = new ModelUsers();
+                            m.setUuid(document.getId());
+                            m.setUsername(document.getData().get("username").toString());
+                            m.setImage(document.getData().get("image").toString());
+                            boolean doesUserFollowThisUser = false;
+                            for (int i = 0; i < myFollowers.size(); i++) {
+                                if (myFollowers.get(i).getUuid().equals(document.getId())) {
+                                    m.setFollwing(true);
+                                    doesUserFollowThisUser = true;
+
+                                    //Checking only for users that this user does follows -u.
+
+                                    /**Add suggestions based on algorithm here
+                                     * Any users added here will not show up
+                                     * in search list, as per instagram's orignal
+                                     * behaviour. --(M. Umair)
+                                     */
+                                    if(uuid.equals(m.getUuid()))
+                                    {
+                                        continue;
+                                    }
+                                    //TODO-Implement suggestionalgohere.All else ready
+                                    //ArrayList<ModelUsers> thisFeedIn = new ArrayList<>();
+                                    //thisFeedIn = suggestionAlgorithm(m.getUuid());
+                                    //Log.d("SuggestionSize*------>",Integer.toString(feedsSuggest.size()));
+                                    feedsSuggest.add(m);
+                                    break;
+                                }
+                            }
+                        }
+
+                    }
+
+                    feedsSearchResultSuggest.addAll(feedsSuggest);
+                    adapterSuggest.notifyDataSetChanged();
+                } else {
+                    Log.d(TAG, "Error getting documents.", task.getException());
+                }
+
             }
         });
 
 
     }
+
 
     private void getAllUsers() {
 
@@ -443,10 +503,10 @@ public class DiscoverFragment extends Fragment {
 
     }
 
+
     private void getFollowersOfFollowers()
     {
         //Get followers of follwers and add them in hashmap.
-
         for (int i=0; i<myFollowers.size(); i++)
         {
             CollectionReference citiesRef = db.collection("follower");
@@ -455,13 +515,19 @@ public class DiscoverFragment extends Fragment {
             query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<QuerySnapshot> task) {
-
+                    int follower=0;
+                    String keyFollwingIdG="";
+                    boolean isAnyNewUserAdded=false;
                     if (task.isSuccessful()) {
+
+                        //followersOfFollersOccurences.clear();
+
                         for (QueryDocumentSnapshot document : task.getResult()) {
                             if (task.isSuccessful()) {
                                 String keyFollwingId = document.getData().get("uid").toString();
                                 String keyFollwerId = document.getData().get("followerid").toString();
-
+                                follower++;
+                                keyFollwingIdG=keyFollwerId;
                                 if (followersOfFollersOccurences.containsKey(keyFollwingId))
                                 {
                                     //Increment count by one on this key.
@@ -471,11 +537,39 @@ public class DiscoverFragment extends Fragment {
                                 {
                                     //Else just add this foller of follower as is an instantiat the count to 1.
                                     followersOfFollersOccurences.put(keyFollwingId, 1);
+
+                                   if(!feedsSuggest.contains(allUsersHash.get(keyFollwingId)))
+                                   {
+                                       if(!myFollowersHah.containsKey(keyFollwingId))
+                                       {
+                                           if(!keyFollwingId.equals(uuid)) {
+                                               feedsSuggest.add(allUsersHash.get(keyFollwingId));
+                                               isAnyNewUserAdded = true;
+                                           }
+                                       }
+
+                                   }
+
+
                                 }
+
+
+
                             }
                         }
                     }
                     //Do something after iterating this user's followers. For now move to the next one.
+                    Log.d("Hash: ","User: "+keyFollwingIdG+" has "+follower);
+                    if(isAnyNewUserAdded) {
+                        Log.d("Hash: ","User: "+keyFollwingIdG+" has "+follower);
+
+                        if(feedsSearchResultSuggest.size()>0){
+                            feedsSearchResultSuggest.clear();
+                        }
+                        feedsSearchResultSuggest.addAll(feedsSuggest);
+                        adapterSuggest.notifyDataSetChanged();
+                        isAnyNewUserAdded=false;
+                    }
                 }
             });
         }
@@ -483,7 +577,7 @@ public class DiscoverFragment extends Fragment {
         /** User's followers of follower's hasmap created
          * along with number of times a user was followed.
          */
-
+/*
         Map<String,Integer> sorted = sortByValues(followersOfFollersOccurences);
         //Only add top 5 most followed users followed by the followers of a user.
         int topFiveCount=0;
@@ -504,79 +598,11 @@ public class DiscoverFragment extends Fragment {
         }
 
         feedsSearchResultSuggest.addAll(feedsSuggest);
-         adapterSuggest.notifyDataSetChanged();
+        adapterSuggest.notifyDataSetChanged();
+
+        */
 
     }
-
-    private ArrayList<ModelUsers> suggestionAlgorithm(String followedUserUuid)
-    {
-
-        final ArrayList<ModelUsers> thisfeed = new ArrayList<>();
-
-        try {
-
-            //Get followers of users that this user is following.
-            CollectionReference citiesRef = db.collection("follower");
-            Query query = citiesRef.whereEqualTo("followerid", followedUserUuid).limit(100);
-
-            query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                    if (task.isSuccessful()) {
-
-                        int someCount= 0;
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            if (task.isSuccessful()) {
-                                final ModelUsers m = new ModelUsers();
-                                m.setUuid(document.getId());
-                                try {
-                                    m.setUsername(document.getData().get("username").toString());
-                                }
-                                catch (Exception e) {
-                                    Log.d("UsrParse Exception: ",e.getMessage());
-                                }
-                                try {
-                                    m.setImage(document.getData().get("image").toString());
-                                }
-                                catch (Exception e) {
-                                    Log.d("ImgParse Exception: ",e.getMessage());
-                                }
-                                //Add only if user is not added previously
-                                //TODO-Implement check here! -Done (M. Umair)
-                                boolean userFound = false;
-                                for (int i = 0; i < feedsSuggest.size(); i++) {
-                                    if (feedsSuggest.get(i).getUuid().equals(document.getId())) {
-                                        userFound=true;
-                                    }
-                                }
-                                //Add only if user is not added previously
-                                if(!userFound)
-                                {
-                                    feedsSuggest.add(m);
-                                    thisfeed.add(m);
-                                }
-
-                            }
-                        }
-
-                        Log.d("SuggestionSize------->",Integer.toString(feedsSuggest.size()));
-
-                    }
-                }
-            });
-
-        }
-        catch (Exception e) {
-            Log.d("Suggestion Exception: ",e.getMessage());
-        }
-        finally {
-            //Release connections here (if any acquired).
-        }
-
-        return thisfeed;
-
-    }
-
 
     public static <K, V extends Comparable<V>> Map<K, V> sortByValues(final Map<K, V> map) {
         Comparator<K> valueComparator =  new Comparator<K>() {
@@ -590,5 +616,7 @@ public class DiscoverFragment extends Fragment {
         sortedByValues.putAll(map);
         return sortedByValues;
     }
+
+
 
 }
