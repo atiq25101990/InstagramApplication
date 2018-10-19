@@ -3,6 +3,7 @@ package mobileprogramming.unimelb.com.instagramapplication.Share;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -56,6 +57,8 @@ public class NextActivity extends AppCompatActivity {
     private int imageCount = 0;
     private String imgUrl;
     private Location currentLocation;
+    private Intent intent;
+    private Bitmap bitmap;
 
     //currentLocation variables
     private FusedLocationProviderClient mFusedLocationClient;
@@ -121,48 +124,22 @@ public class NextActivity extends AppCompatActivity {
                 //upload the image to firebase
                 Toast.makeText(NextActivity.this,"Attempting to upload new photo", Toast.LENGTH_LONG).show();
                 String caption = mCaption.getText().toString();
-                mFirebaseMethods.uploadNewPhoto(getString(R.string.new_photo), caption, imageCount, imgUrl, currentLocation.toString());
+
+                if(intent.hasExtra(getString(R.string.selected_image))){
+                    imgUrl = intent.getStringExtra(getString(R.string.selected_image));
+                    mFirebaseMethods.uploadNewPhoto(getString(R.string.new_photo), caption, imageCount, imgUrl, null, currentLocation.toString());
+                }else if(intent.hasExtra(getString(R.string.selected_bitmap))){
+                    bitmap = (Bitmap) intent.getParcelableExtra(getString(R.string.selected_bitmap));
+                    mFirebaseMethods.uploadNewPhoto(getString(R.string.new_photo), caption, imageCount, null, bitmap, currentLocation.toString());
+                }
+
             }
         });
 
         setImage();
     }
 
-    //Verify all the permissions passed to the array
-    private void verifyPermissions(String[] permissions) {
-        Log.d(TAG,"checkPermissionsArray: checking permissions array.");
 
-        ActivityCompat.requestPermissions(NextActivity.this, permissions, VERIFY_PERMISSIONS_REQUEST);
-
-    }
-
-
-    //Check an array of permissions
-    public boolean checkPermissionsArray(String[] permissions) {
-        Log.d(TAG,"checkPermissionsArray: checking permissions array.");
-
-        for(int i=0; i<permissions.length;i++){
-            String check = permissions[i];
-            if(!checkPermissions(check)){
-                return false;
-            }
-        }
-        return true;
-    }
-
-    //check single permission if it has been verified or not
-    public boolean checkPermissions(String permission) {
-        Log.d(TAG,"checkPermissions: checking permission: " + permission);
-
-        int permissionRequest = ActivityCompat.checkSelfPermission(NextActivity.this, permission);
-        if(permissionRequest != PackageManager.PERMISSION_GRANTED){
-            Log.d(TAG, "checkPermissions: \n Permission was not granted for: " +permission);
-            return false;
-        }else{
-            Log.d(TAG, "checkPermissions: \n Permission was granted for: " +permission);
-            return true;
-        }
-    }
 
     private void someMethod(){
         /*
@@ -174,7 +151,7 @@ public class NextActivity extends AppCompatActivity {
         *
         * Step 4: i.    Upload the photo to Firebase Storage
         *         ii.   insert into 'post' node
-        *         iii.  insert into 'user_photos' node
+        *         iii.  If I get time, insert into 'user_photos' node
         * */
     }
 
@@ -182,10 +159,19 @@ public class NextActivity extends AppCompatActivity {
      * gets the image url from the incoming intent and displays the chosen image
      * */
     private void setImage(){
-        Intent intent = getIntent();
+        intent = getIntent();
         ImageView image = findViewById(R.id.imageShare);
-        imgUrl = intent.getStringExtra(getString(R.string.selected_image));
-        UniversalImageLoader.setImage(imgUrl, image, null, mAppend);
+
+        if(intent.hasExtra(getString(R.string.selected_image))){
+            imgUrl = intent.getStringExtra(getString(R.string.selected_image));
+            Log.d(TAG, "setImage: got new bitmap: " +imgUrl);
+            UniversalImageLoader.setImage(imgUrl, image, null, mAppend);
+        }else if(intent.hasExtra(getString(R.string.selected_bitmap))){
+            bitmap = (Bitmap) intent.getParcelableExtra(getString(R.string.selected_bitmap));
+            Log.d(TAG, "setImage: got new bitmap");
+            image.setImageBitmap(bitmap);
+        }
+
     }
 
       /*
@@ -248,6 +234,44 @@ public class NextActivity extends AppCompatActivity {
         super.onStop();
         if (mAuthListener != null) {
             mAuth.removeAuthStateListener(mAuthListener);
+        }
+    }
+
+    /***** Requesting user permission for enabling location if user choose no initially *****/
+
+    //Verify all the permissions passed to the array
+    private void verifyPermissions(String[] permissions) {
+        Log.d(TAG,"checkPermissionsArray: checking permissions array.");
+
+        ActivityCompat.requestPermissions(NextActivity.this, permissions, VERIFY_PERMISSIONS_REQUEST);
+
+    }
+
+
+    //Check an array of permissions
+    public boolean checkPermissionsArray(String[] permissions) {
+        Log.d(TAG,"checkPermissionsArray: checking permissions array.");
+
+        for(int i=0; i<permissions.length;i++){
+            String check = permissions[i];
+            if(!checkPermissions(check)){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    //check single permission if it has been verified or not
+    public boolean checkPermissions(String permission) {
+        Log.d(TAG,"checkPermissions: checking permission: " + permission);
+
+        int permissionRequest = ActivityCompat.checkSelfPermission(NextActivity.this, permission);
+        if(permissionRequest != PackageManager.PERMISSION_GRANTED){
+            Log.d(TAG, "checkPermissions: \n Permission was not granted for: " +permission);
+            return false;
+        }else{
+            Log.d(TAG, "checkPermissions: \n Permission was granted for: " +permission);
+            return true;
         }
     }
 

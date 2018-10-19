@@ -14,8 +14,11 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
@@ -24,11 +27,13 @@ import com.google.firebase.storage.UploadTask;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.TimeZone;
 
 import mobileprogramming.unimelb.com.instagramapplication.MainActivity;
 import mobileprogramming.unimelb.com.instagramapplication.R;
+import mobileprogramming.unimelb.com.instagramapplication.models.Model;
 import mobileprogramming.unimelb.com.instagramapplication.models.Photo;
 
 public class FirebaseMethods {
@@ -62,7 +67,8 @@ public class FirebaseMethods {
         }
     }
 
-    public void uploadNewPhoto(String photoType,final String caption,final int count, final String imgUrl,final  String location){
+    public void uploadNewPhoto(String photoType,final String caption,final int count, final String imgUrl, Bitmap bm,
+                               final  String location){
 
         Log.d(TAG, "uploadNewPhoto: attempting to upload new photo.");
 
@@ -76,7 +82,9 @@ public class FirebaseMethods {
                     .child(filePaths.FIREBASE_IMAGE_STORAGE + "/" + user_id + "/photo" + (count + 1));
 
             //convert image url to bitmap
-            Bitmap bm = ImageManager.getBitmap(imgUrl);
+            if(bm == null){
+                bm = ImageManager.getBitmap(imgUrl);
+            }
             byte[] bytes = ImageManager.getBytesFromBitmap(bm, 100);
 
             UploadTask uploadTask = null;
@@ -124,7 +132,7 @@ public class FirebaseMethods {
                 }
             });
         }
-        //case2: new profile photo
+        //case2: new profile photo (if I get time)
 
     }
 
@@ -139,15 +147,18 @@ public class FirebaseMethods {
 
         Toast.makeText(mContext, "Reached addPhotoToDatabase before insertion", Toast.LENGTH_LONG).show();
 
+        String user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        String username = getUsername(user_id);
+
         String tags = StringManipulation.getTags(caption);
         String newPhotoKey = myRef.child(mContext.getString(R.string.dbname_photos)).push().getKey();
         Photo photo = new Photo();
         photo.setCaption(caption);
         photo.setDate_created(getTimestamp());
-        photo.setImage_path(url);
+        photo.setImage(url);
         photo.setTags(tags);
-        photo.setUser_id(FirebaseAuth.getInstance().getCurrentUser().getUid());
-        photo.setUsername("Test");
+        photo.setUid(user_id);
+        photo.setUsername(username);
         photo.setPhoto_id(newPhotoKey);
         photo.setLocation(photoLocation);
 
@@ -182,5 +193,57 @@ public class FirebaseMethods {
         }
         return count;
     }
+
+
+    public String getUsername(final String userID) {
+        Log.d(TAG, "getUsername: getting username");
+
+        final String[] username = new String[1];
+        myRef = FirebaseDatabase.getInstance().getReference().child("Users");
+
+        ValueEventListener postListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // Get Post object and use the values to update the UI
+                for(DataSnapshot userDetailList : dataSnapshot.getChildren()) {
+                    Model userDetails = userDetailList.getValue(Model.class);
+                    if(userDetails.getUuid().toString().equals(userID.toString()))
+                        username[0] = userDetails.getUsername().toString();
+                    Toast.makeText(mContext, "Username " + username[0], Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Getting Post failed, log a message
+                Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
+                // ...
+            }
+        };
+        myRef.addValueEventListener(postListener);
+
+
+        /*final String[] username = new String[1];
+        DatabaseReference userDetail = myRef.child("Users").child(mAuth.getCurrentUser().getUid());
+        userDetail.child("UsersTable").child(userDetail.toString()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists())
+                {
+                    for(DataSnapshot userDetailList : dataSnapshot.getChildren()) {
+                        //Log.d(TAG, "valueName:", + userDetailList.child("Name").getValue().toString());
+                        username[0] = userDetailList.child("Name").getValue().toString();
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });*/
+
+        return username[0];
+    }
+
 
 }
