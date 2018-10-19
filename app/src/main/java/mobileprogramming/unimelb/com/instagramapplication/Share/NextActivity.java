@@ -30,6 +30,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import mobileprogramming.unimelb.com.instagramapplication.MainActivity;
 import mobileprogramming.unimelb.com.instagramapplication.R;
 import mobileprogramming.unimelb.com.instagramapplication.utils.FirebaseMethods;
 import mobileprogramming.unimelb.com.instagramapplication.utils.Permissions;
@@ -54,7 +55,7 @@ public class NextActivity extends AppCompatActivity {
 
     //vars
     private String mAppend = "file:/";
-    private int imageCount = 0;
+    private int imageCount;
     private String imgUrl;
     private Location currentLocation;
     private Intent intent;
@@ -164,7 +165,7 @@ public class NextActivity extends AppCompatActivity {
 
         if(intent.hasExtra(getString(R.string.selected_image))){
             imgUrl = intent.getStringExtra(getString(R.string.selected_image));
-            Log.d(TAG, "setImage: got new bitmap: " +imgUrl);
+            Log.d(TAG, "setImage: got new image: " +imgUrl);
             UniversalImageLoader.setImage(imgUrl, image, null, mAppend);
         }else if(intent.hasExtra(getString(R.string.selected_bitmap))){
             bitmap = (Bitmap) intent.getParcelableExtra(getString(R.string.selected_bitmap));

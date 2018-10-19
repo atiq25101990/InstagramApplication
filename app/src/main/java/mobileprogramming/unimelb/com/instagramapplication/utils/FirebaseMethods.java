@@ -78,6 +78,7 @@ public class FirebaseMethods {
             Log.d(TAG, "uploadNewPhoto: uploading new photo.");
 
             String user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            Toast.makeText(mContext, "uploadNewPhoto: Count " +count, Toast.LENGTH_LONG).show();
             StorageReference storageReference = mStorageReference
                     .child(filePaths.FIREBASE_IMAGE_STORAGE + "/" + user_id + "/photo" + (count + 1));
 
@@ -109,6 +110,8 @@ public class FirebaseMethods {
                     Toast.makeText(mContext, "Photo upload success", Toast.LENGTH_LONG).show();
 
                     //navigate to the main feed so the user can see the photo
+                    Intent intent = new Intent(mContext, MainActivity.class);
+                    mContext.startActivity(intent);
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
@@ -186,7 +189,7 @@ public class FirebaseMethods {
 
         int count = 0;
         for(DataSnapshot ds: dataSnapshot
-                .child(mContext.getString(R.string.dbname_user_photos))
+                .child(mContext.getString(R.string.dbname_photos))
                 .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .getChildren()){
             count++;
