@@ -65,6 +65,11 @@
     <string name="post_image">Post image</string>
     <string name="text_likes">Likes</string>
     <string name="text_description">description</string>
+    <string name="search_by_username">Search by username</string>
+    <string name="friend_suggestions">Friend Suggestions</string>
+    <string name="search_results">Search Results</string>
+    <string name="follow_text">Follow</string>
+    <string name="username_text">Username</string>
 
     <!-- Intent Extras -->
     <string name="selected_image">selected_image</string>

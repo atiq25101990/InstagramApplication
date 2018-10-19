@@ -21,6 +21,10 @@ import mobileprogramming.unimelb.com.instagramapplication.utils.Permissions;
  */
 public class PhotoFragment extends Fragment{
 
+    public static String getTAG() {
+        return TAG;
+    }
+
     private static final String TAG = "PhotoFragment";
     //constant
     private static final int PHOTO_FRAGMENT_NUM = 1;

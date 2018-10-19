@@ -63,7 +63,7 @@ public class ProfileImageAdapter extends BaseAdapter {
                 public void onClick(View v) {
                     Intent intent = new Intent(mContext, PostActivity.class);
                     intent.putExtra("postid", urlList.get(pos));
-                    intent.putExtra("profileURL", profile.get("image"));
+                    intent.putExtra("profileURL", profile.get("imageURL"));
                     intent.putExtra("profileUsername", profile.get("username"));
                     mContext.startActivity(intent);
                 }

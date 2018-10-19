@@ -68,6 +68,11 @@ public class UserFeedsFragment extends Fragment {
     private View view;
     private RecyclerViewLoadMoreScroll scrollListener;
     private FragmentManager fm;
+
+    public String getTAG() {
+        return TAG;
+    }
+
     private String TAG = "UserFeedsFragment";
     private String uuid;
 
@@ -92,8 +97,8 @@ public class UserFeedsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
-        ((MainActivity) getActivity()).setBottomNavigationView();
 
+        CommonUtils.showLoadingDialog(getContext());
         uuid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         userDetails = SessionManagers.getInstance().getUserDetails();
@@ -248,7 +253,6 @@ public class UserFeedsFragment extends Fragment {
         //id ==1 for location
         //default id 0
         Log.d("selected", "=>" + id);
-        CommonUtils.showLoadingDialog(getContext());
         CollectionReference citiesRef = db.collection("post");
         Query query;
         if (id == 0) {
