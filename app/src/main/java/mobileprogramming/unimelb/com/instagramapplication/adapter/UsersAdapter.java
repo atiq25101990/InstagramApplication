@@ -8,11 +8,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
-import java.sql.BatchUpdateException;
 import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -30,9 +30,14 @@ public class UsersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     AppCompatActivity mContext;
     int total_types;
     private OnItemClickListener onItemClickListener;
-    private ArrayList<ModelUsers> dataSet;
+    private ArrayList<ModelUsers> dataSet = new ArrayList<>();
 
     public UsersAdapter(AppCompatActivity context, ArrayList<ModelUsers> data) {
+//        for (ModelUsers modelUsers : data) {
+//            if (!modelUsers.getUuid().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+//                this.dataSet.add(modelUsers);
+//            }
+//        }
         this.dataSet = data;
         this.mContext = context;
         total_types = dataSet.size();
@@ -110,6 +115,7 @@ public class UsersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         return dataSet == null ? 0 : dataSet.size();
     }
 
+
     @Override
     public void onBindViewHolder(final RecyclerView.ViewHolder holder, final int listPosition) {
 
@@ -174,6 +180,7 @@ public class UsersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                         }
                     });
                     break;
+
             }
         }
 
@@ -195,17 +202,18 @@ public class UsersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         CircleImageView background;
         Button btn_follow;
         String uid;
+        RelativeLayout cardView;
 
 
         public ImageTypeViewHolder(final View itemView) {
             super(itemView);
+            cardView = itemView.findViewById(R.id.card_view);
             txt_username = itemView.findViewById(R.id.txt_username);
             background = itemView.findViewById(R.id.background);
             btn_follow = itemView.findViewById(R.id.btn_follow);
         }
 
     }
-
 
 
 }

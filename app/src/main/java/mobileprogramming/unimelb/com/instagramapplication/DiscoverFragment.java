@@ -74,7 +74,7 @@ public class DiscoverFragment extends Fragment {
     private View view;
     private RecyclerViewLoadMoreScroll scrollListener;
     private FragmentManager fm;
-    private String TAG = "UserFeedsFragment";
+    private String TAG = "DiscoverFragment";
     private String uuid;
 
     public DiscoverFragment() {
@@ -361,7 +361,13 @@ public class DiscoverFragment extends Fragment {
                         }
 
                     }
-                    feedsSearchResult.addAll(feeds);
+
+                    // Filter out the current user from the list
+                    for (ModelUsers modelUsers: feeds){
+                        if(!modelUsers.getUuid().equals(uuid)){
+                            feedsSearchResult.add(modelUsers);
+                        }
+                    }
                     adapter.notifyDataSetChanged();
                 } else {
                     Log.d(TAG, "Error getting documents.", task.getException());
