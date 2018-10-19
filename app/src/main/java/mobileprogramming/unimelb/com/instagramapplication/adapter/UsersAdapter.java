@@ -33,11 +33,6 @@ public class UsersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private ArrayList<ModelUsers> dataSet = new ArrayList<>();
 
     public UsersAdapter(AppCompatActivity context, ArrayList<ModelUsers> data) {
-//        for (ModelUsers modelUsers : data) {
-//            if (!modelUsers.getUuid().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
-//                this.dataSet.add(modelUsers);
-//            }
-//        }
         this.dataSet = data;
         this.mContext = context;
         total_types = dataSet.size();

@@ -4,25 +4,16 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.OrientationHelper;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.ImageButton;
+import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -30,24 +21,20 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import de.hdodenhof.circleimageview.CircleImageView;
-import mobileprogramming.unimelb.com.instagramapplication.adapter.FeedCommentsAdapter;
-import mobileprogramming.unimelb.com.instagramapplication.listener.OnLoadMoreListener;
-import mobileprogramming.unimelb.com.instagramapplication.listener.RecyclerViewLoadMoreScroll;
 import mobileprogramming.unimelb.com.instagramapplication.models.ModelLikes;
-import mobileprogramming.unimelb.com.instagramapplication.utils.Constant;
 import mobileprogramming.unimelb.com.instagramapplication.utils.SessionManagers;
 
 public class PostActivity extends AppCompatActivity {
 
 
     private static final String TAG = "PostActivity";
-    @BindView(R.id.commentsRecycler)
-    RecyclerView commentsRecycler;
+//    @BindView(R.id.commentsRecycler)
+//    RecyclerView commentsRecycler;
 
     @BindView(R.id.background)
     CircleImageView background;
@@ -74,16 +61,15 @@ public class PostActivity extends AppCompatActivity {
     private FragmentManager fm;
     private String uuid;
     private String postid;
-    private FeedCommentsAdapter adapter;
-//    @BindView(R.id.btn_send)
-//    ImageButton btn_send;
-//    @BindView(R.id.edt_comments)
-//    EditText edt_comments;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    private ArrayList<ModelLikes> feeds;
-    private RecyclerViewLoadMoreScroll scrollListener;
     private String postLink;
+    private String profileImageLink;
+    private String profileUserName;
+    private String date;
+    private String location;
+    private ArrayList<Object> comments;
+    private ArrayList<Object> likes;
 
 
     @Override
@@ -94,32 +80,19 @@ public class PostActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         userDetails = SessionManagers.getInstance().getUserDetails();
-        fm = getSupportFragmentManager();
-        uuid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
         if (getIntent() != null) {
             postLink = getIntent().getStringExtra("postid");
+            profileImageLink = getIntent().getStringExtra("profileURL");
+            profileUserName = getIntent().getStringExtra("profileUsername");
 
         }
 
         getPostID();
+        getLikes();
+        getComments();
 
-        commentsRecycler.setHasFixedSize(true);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(PostActivity.this, OrientationHelper.VERTICAL, false);
-        commentsRecycler.setLayoutManager(linearLayoutManager);
-
-        adapter = new FeedCommentsAdapter(this, feeds);
-        commentsRecycler.setAdapter(adapter);
-        scrollListener = new RecyclerViewLoadMoreScroll(linearLayoutManager);
-        scrollListener.setOnLoadMoreListener(new OnLoadMoreListener() {
-            @Override
-            public void onLoadMore() {
-//LoadMoreData();
-            }
-        });
-        commentsRecycler.addOnScrollListener(scrollListener);
-
-
-    }
+   }
 
     private void getPostID() {
         CollectionReference postRef = db.collection("post");
@@ -129,80 +102,86 @@ public class PostActivity extends AppCompatActivity {
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                     postid = document.getId();
-
+                    date = String.valueOf(document.get("date"));
+                    location = document.getString("location");
+                    uuid = document.getString("uid");
                 }
 
-                setupListener();
+                setupImages();
             }
         });
     }
 
-    private void setupListener() {
-//        btn_send.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if (edt_comments.getText().length() > 0) {
-//                    Map<String, Object> comment = new HashMap<>();
-//                    comment.put("postid", postid);
-//                    comment.put("uid", uuid);
-//                    comment.put("text", edt_comments.getText().toString());
-//                    comment.put("commenttime", FieldValue.serverTimestamp());
-//                    comment.put("username", userDetails.get(Constant.KEY_UNAME));
-//                    db.collection("comments").add(comment).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-//                        @Override
-//                        public void onSuccess(DocumentReference documentReference) {
-//                            final ModelLikes m = new ModelLikes();
-//                            m.setUuid(uuid);
-//                            m.setUsername(userDetails.get(Constant.KEY_UNAME));
-//                            m.setText(edt_comments.getText().toString());
-//                            feeds.add(m);
-//                            adapter.notifyDataSetChanged();
-//                            edt_comments.setText("");
-//                        }
-//                    })
-//                            .addOnFailureListener(new OnFailureListener() {
-//                                @Override
-//                                public void onFailure(@NonNull Exception e) {
-//
-//                                }
-//                            });
-//                } else {
-//                    Toast.makeText(PostActivity.this, "Empty comment not allowed", Toast.LENGTH_SHORT).show();
-//                }
-//            }
-//        });
-
-        getUserComments();
+    private void setupImages() {
+        textUsername.setText(profileUserName);
+        textDate.setText(date);
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        postImage.setLayoutParams(layoutParams);
+        Glide.with(this).load(postLink).into(postImage);
+        Glide.with(this).load(profileImageLink).into(background);
+        setupListeners();
     }
 
-
-    private void getUserComments() {
-        feeds.clear();
-
-        CollectionReference citiesRef = db.collection("comments");
-        Query query = citiesRef.whereEqualTo("postid", postid).orderBy("commenttime", Query.Direction.ASCENDING).limit(100);
-        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+    private void setupListeners() {
+        background.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+            public void onClick(View v) {
+                finish();
+            }
+        });
 
-                if (task.isSuccessful()) {
-                    try {
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            final ModelLikes m = new ModelLikes();
-                            m.setUuid(document.getData().get("uid").toString());
-                            m.setUsername(document.getData().get("username").toString());
-                            m.setText(document.getData().get("text").toString());
-                            feeds.add(m);
-                            adapter.notifyDataSetChanged();
-                        }
-                    } catch (Exception e) {
-                    }
-                } else {
-                    Log.d(TAG, "Error getting documents.", task.getException());
+        textUsername.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
+        btnLike.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+    }
+
+
+    private void getLikes(){
+        CollectionReference likesRef = db.collection("likes");
+        Query query = likesRef.whereEqualTo("postid", postid);
+
+        query.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                likes = new ArrayList<>();
+                for(QueryDocumentSnapshot queryDocumentSnapshot: queryDocumentSnapshots){
+                        likes.add(queryDocumentSnapshot.getString("uid"));
+
                 }
+                String text = String.valueOf(likes.size()) + ' ' + getResources().getString(R.string.text_likes);
+                textLikes.setText(text);
             }
         });
 
 
     }
+
+    private void getComments() {
+        CollectionReference likesRef = db.collection("comments");
+        Query query = likesRef.whereEqualTo("postid", postid);
+
+        query.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                comments = new ArrayList<>();
+                for(QueryDocumentSnapshot queryDocumentSnapshot: queryDocumentSnapshots){
+                    comments.add(queryDocumentSnapshot.getString("uid"));
+
+                }
+
+            }
+        });
+    }
+
+
 }

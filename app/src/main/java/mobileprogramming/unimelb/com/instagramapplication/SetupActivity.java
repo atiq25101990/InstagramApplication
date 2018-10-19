@@ -37,6 +37,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import mobileprogramming.unimelb.com.instagramapplication.utils.CommonUtils;
 
 
 public class SetupActivity extends AppCompatActivity {
@@ -141,6 +142,7 @@ public class SetupActivity extends AppCompatActivity {
 
                 if(!TextUtils.isEmpty(username) && mainImageURI != null) {
 
+                    CommonUtils.showLoadingDialog(view.getContext());
                     setupProgress.setVisibility(View.VISIBLE);
 
                     if(isChanged){
@@ -172,7 +174,9 @@ public class SetupActivity extends AppCompatActivity {
 
                     }//end of isChanged if statement
 
-                } //end of validating username if statement
+                } else {
+                    Toast.makeText(view.getContext(), "Please complete all details.", Toast.LENGTH_LONG).show();//end of validating username if statement
+                }
 
             }//end of onclick method
 

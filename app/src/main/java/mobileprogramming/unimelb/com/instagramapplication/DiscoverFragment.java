@@ -81,6 +81,10 @@ public class DiscoverFragment extends Fragment {
         // Required empty public constructor
     }
 
+    public static DiscoverFragment newInstance() {
+        return new DiscoverFragment();
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

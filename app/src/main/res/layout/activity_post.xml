@@ -7,8 +7,4 @@
 
     <include layout="@layout/item_type_1" />
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/commentsRecycler"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
 </LinearLayout>

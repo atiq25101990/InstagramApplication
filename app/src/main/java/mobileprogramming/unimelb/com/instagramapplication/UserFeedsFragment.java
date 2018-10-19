@@ -76,6 +76,9 @@ public class UserFeedsFragment extends Fragment {
     public UserFeedsFragment() {
     }
 
+    public static UserFeedsFragment newInstance() {
+        return new UserFeedsFragment();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -131,7 +134,7 @@ public class UserFeedsFragment extends Fragment {
                                     likeObject.put("username", userDetails.get(Constant.KEY_UNAME));
                                     likeObject.put("date", Calendar.getInstance().getTime());
                                     Map<String, Object> activity = new HashMap<>();
-                                    activity.put("done_by_id",done_by_id);
+                                    activity.put("done_by_id", done_by_id);
                                     activity.put("done_by_name", done_by_name);
 
                                     activity.put("done_for_id", feeds.get(position).getUuid());
@@ -289,51 +292,5 @@ public class UserFeedsFragment extends Fragment {
                 }
             }
         });
-
-
-//        // Construct query for first 5 post, ordered by postid
-//        first = db.collection("post")
-//                .orderBy("postid")
-//                .limit(5);
-//        first.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-//            @Override
-//            public void onSuccess(QuerySnapshot documentSnapshots) {
-//                // Get the last visible document
-//              //  DocumentSnapshot lastVisible = documentSnapshots.getDocuments().get(documentSnapshots.size() - 1);
-//
-//                for (DocumentSnapshot document : documentSnapshots.getDocuments()) {
-//                    final Model m = new Model();
-//                    m.setPostid(document.getId());
-//                    m.setImage(document.getData().get("image").toString());
-//                    m.setUuid(document.getData().get("uid").toString());
-//                    m.setUsername(document.getData().get("username").toString());
-//
-//                    CollectionReference citiesRef = db.collection("likes");
-//                    Query query = citiesRef.whereEqualTo("postid", document.getId());
-//                    query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-//                        @Override
-//                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-//                            pbar.setVisibility(View.GONE);
-//
-//                            if (task.isSuccessful()) {
-//                                m.setLikes(task.getResult().size());
-//                            }
-//                            feeds.add(m);
-//                            adapter.notifyDataSetChanged();
-//                        }
-//                    });
-//                }
-//
-//                // Construct a new query starting at this document,
-//                // get the next 25 cities.
-//                first = db.collection("post")
-//                        .orderBy("postid")
-//                        .limit(5);
-//
-//
-//            }
-//        });
-
-
     }
 }

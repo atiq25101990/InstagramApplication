@@ -58,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        CommonUtils.showLoadingDialog(MainActivity.this);
         mAuth = FirebaseAuth.getInstance();
         mFirestore = FirebaseFirestore.getInstance();
         mainToolbar = findViewById(R.id.main_toolbar);
@@ -69,16 +70,15 @@ public class MainActivity extends AppCompatActivity {
         mMainFrame = (FrameLayout) findViewById(R.id.main_frame);
         mMainNav = (BottomNavigationView) findViewById(R.id.main_nav);
 
-        userFeedsFragment = new UserFeedsFragment();
-        discoverFragment = new DiscoverFragment();
+        userFeedsFragment = UserFeedsFragment.newInstance();
+        discoverFragment = DiscoverFragment.newInstance();
         photoFragment = new PhotoFragment();
-        activityFeedsFragment = new ActivityFeedsFragment();
-        profileFragment = new ProfileFragment();
+        profileFragment = ProfileFragment.newInstance();
+
         if (!SessionManagers.getInstance().IsLogin()) {
             FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
             if (currentUser != null) {
 
-                CommonUtils.showLoadingDialog(MainActivity.this);
                 user_id = mAuth.getCurrentUser().getUid();
                 mFirestore.collection("Users").document(user_id).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
@@ -193,9 +193,18 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Exit the app if back button is pressed on the home tab.
+     * Otherwise go to the previous tab.
+     */
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        Fragment fragment = getVisibleFragment();
+        if (fragment instanceof UserFeedsFragment) {
+            finish();
+        } else {
+            super.onBackPressed();
+        }
     }
 
     public void setBottomNavigationView() {
