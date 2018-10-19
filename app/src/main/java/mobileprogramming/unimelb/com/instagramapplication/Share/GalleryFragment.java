@@ -1,6 +1,7 @@
 package mobileprogramming.unimelb.com.instagramapplication.Share;
 
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.media.Image;
 import android.os.Bundle;
@@ -48,6 +49,7 @@ public class GalleryFragment extends Fragment {
     //vars
     private ArrayList<String> directories;
     private String mAppend = "file:/";
+    private String mSelectedImage;
 
     public GalleryFragment() {
         // Required empty public constructor
@@ -81,6 +83,10 @@ public class GalleryFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 Log.d(TAG,"onClick: navigating to the final share screen");
+
+                Intent intent = new Intent(getActivity(), NextActivity.class);
+                intent.putExtra(getString(R.string.selected_image), mSelectedImage);
+                startActivity(intent);
             }
         });
 
@@ -96,6 +102,14 @@ public class GalleryFragment extends Fragment {
         //check for other folders inside "/storage/emulated/0/pictures"
         if(FileSearch.getDirectoryPaths(filePaths.PICTURES) != null){
             directories = FileSearch.getDirectoryPaths(filePaths.PICTURES);
+        }
+
+        ArrayList<String> directoryNames = new ArrayList<String>();
+        for(int i=0;i<directories.size();i++) {
+
+            int index = directories.get(i).lastIndexOf("/");
+            String string = directories.get(i).substring(index);
+            directoryNames.add(string);
         }
 
         directories.add(filePaths.CAMERA);
@@ -137,12 +151,14 @@ public class GalleryFragment extends Fragment {
 
         //set the first image to be displayed when the activity fragment view is inflated
         setImage(imgURLs.get(0), galleryImage, mAppend);
+        mSelectedImage = imgURLs.get(0);
 
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Log.d(TAG,"onItemClick: selected an image: "+ imgURLs.get(i));
                 setImage(imgURLs.get(i), galleryImage, mAppend);
+                mSelectedImage = imgURLs.get(i);
             }
         });
 

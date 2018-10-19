@@ -21,6 +21,8 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -50,18 +52,24 @@ public class SetupActivity extends AppCompatActivity {
     //specifically this variable job is to constantly check for update in cropped image
     private Uri mainImageURI = null;
 
+    //variables
     private String user_id;
     private boolean isChanged = false;
 
+    //frontend variables
     private EditText setupName;
     private EditText setupUsername;
     private EditText setupBio;
     private Button setupBtn;
     private ProgressBar setupProgress;
 
+    //Firebase variables
     private StorageReference storageReference;
     private FirebaseAuth mAuth;
     private FirebaseFirestore mFirestore;
+
+    //location variable
+    private FusedLocationProviderClient mFusedLocationClient;
 
 
     @Override
@@ -72,6 +80,8 @@ public class SetupActivity extends AppCompatActivity {
         final Toolbar setupToolbar = findViewById(R.id.setup_toolbar);
         setSupportActionBar(setupToolbar);
         getSupportActionBar().setTitle("Account Setup");
+
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         setupImage = findViewById(R.id.setup_image);
         setupName = findViewById(R.id.setup_name);

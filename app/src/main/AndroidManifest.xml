@@ -3,9 +3,13 @@
     package="mobileprogramming.unimelb.com.instagramapplication">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Permission for camera -->
     <uses-permission android:name="android.permission.CAMERA" />
+    <!-- Permission for storage -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <!-- Permission for location -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <!-- To auto-complete the email text field in the login form with the user's emails -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.READ_PROFILE" />
@@ -35,6 +39,7 @@
         <activity android:name=".RegisterActivity" />
         <activity android:name=".SetupActivity" />
         <activity android:name=".Share.ShareActivity" />
+        <activity android:name=".Share.NextActivity" />
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat" />
