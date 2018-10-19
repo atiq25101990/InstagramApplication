@@ -103,7 +103,6 @@ public class DiscoverFragment extends Fragment {
         ButterKnife.bind(this, view);
         uuid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        CommonUtils.showLoadingDialog(getContext());
         recyclerViewSuggestions.setHasFixedSize(true);
         LinearLayoutManager horizontalLayoutManagerSug = new LinearLayoutManager(getContext(), OrientationHelper.HORIZONTAL, false);
         recyclerViewSuggestions.setLayoutManager(horizontalLayoutManagerSug);
@@ -376,9 +375,7 @@ public class DiscoverFragment extends Fragment {
                         }
                     }
                     adapter.notifyDataSetChanged();
-                    CommonUtils.dismissProgressDialog();
                 } else {
-                    CommonUtils.dismissProgressDialog();
                     Log.d(TAG, "Error getting documents.", task.getException());
                 }
             }

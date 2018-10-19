@@ -33,7 +33,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import de.hdodenhof.circleimageview.CircleImageView;
 import mobileprogramming.unimelb.com.instagramapplication.adapter.ProfileImageAdapter;
-import mobileprogramming.unimelb.com.instagramapplication.utils.CommonUtils;
 
 
 /**
@@ -118,11 +117,9 @@ public class ProfileFragment extends Fragment {
         }
         Log.d(TAG, "onViewCreated: The username is " + uuid);
 
-        CommonUtils.showLoadingDialog(getContext());
         getFollowingCount();
         getFollowerCount();
         getPostCount();
-        getPostedImages();
 
     }
 
@@ -142,6 +139,8 @@ public class ProfileFragment extends Fragment {
                         profileUserName.setText(profileUser.get("username"));
                         profileDisplayName.setText(profileUser.get("name"));
                         Glide.with(getContext()).load(document.getString("image")).into(profileCircularPicture);
+
+                        getPostedImages();
                     } else {
                         Log.d(TAG, "onComplete: Failed to get document");
                     }
@@ -225,7 +224,6 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
-                    CommonUtils.dismissProgressDialog();
                     Log.d(TAG, "getPostCount: calculating the count");
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         if (task.isSuccessful()) {

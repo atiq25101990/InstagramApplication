@@ -17,7 +17,6 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.LinkedHashSet;
-import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import mobileprogramming.unimelb.com.instagramapplication.R;
@@ -76,7 +75,7 @@ public class ActivityFollowingAdapter extends RecyclerView.Adapter<RecyclerView.
 
 
     private void setPostImage(String image, ImageView feedPostImage) {
-        Glide.with(mContext).load(image).into(feedPostImage);
+        Glide.with(mContext.getApplicationContext()).load(image).into(feedPostImage);
     }
 
     private void getUserPhoto(String done_by_id, final CircleImageView feedUserImage) {
@@ -93,7 +92,7 @@ public class ActivityFollowingAdapter extends RecyclerView.Adapter<RecyclerView.
     }
 
     private void setUserImage(String image, CircleImageView feedUserImage) {
-        Glide.with(mContext).load(image).into(feedUserImage);
+        Glide.with(mContext.getApplicationContext()).load(image).into(feedUserImage);
 
     }
 

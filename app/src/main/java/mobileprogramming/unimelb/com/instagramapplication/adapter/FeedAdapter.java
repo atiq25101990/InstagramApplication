@@ -138,7 +138,7 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
                 case Model.IMAGE_TYPE:
                     final ImageTypeViewHolder imageTypeViewHolder = (ImageTypeViewHolder) holder;
-                    imageTypeViewHolder.txt_likes.setText(String.valueOf(object.getLikes()) + " Total likes");
+                    imageTypeViewHolder.txt_likes.setText(String.valueOf(object.getLikes()) + " likes");
                     imageTypeViewHolder.txt_username.setText(String.valueOf(object.getUsername()));
                     imageTypeViewHolder.uid = object.getUuid();
                     SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM dd HH:mm:ss Z yyyy");
