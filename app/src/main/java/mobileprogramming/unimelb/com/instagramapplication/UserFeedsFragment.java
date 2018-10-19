@@ -68,6 +68,11 @@ public class UserFeedsFragment extends Fragment {
     private View view;
     private RecyclerViewLoadMoreScroll scrollListener;
     private FragmentManager fm;
+
+    public String getTAG() {
+        return TAG;
+    }
+
     private String TAG = "UserFeedsFragment";
     private String uuid;
 

@@ -48,6 +48,8 @@ dependencies {
     implementation 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
     //For JUnit testing and other android supported libraries
     testImplementation 'junit:junit:4.12'
+    //Image Editor
+    implementation 'ja.burhanrashid52:photoeditor:0.3.3'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'com.android.support.constraint:constraint-layout:1.0.0-alpha9'

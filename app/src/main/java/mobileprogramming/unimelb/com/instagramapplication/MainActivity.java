@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
                                 userProfile.put(Constant.KEY_NAME, task.getResult().getString("name"));
                                 userProfile.put(Constant.KEY_UNAME, task.getResult().getString("username"));
                                 SessionManagers.getInstance().setUserProfile(userProfile);
-                                setFragment(userFeedsFragment);
+                                setFragment(userFeedsFragment, userFeedsFragment.getTAG());
                                 selectFragment();
                             }
 
@@ -102,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         } else {
-            setFragment(userFeedsFragment);
+            setFragment(userFeedsFragment, userFeedsFragment.getTAG());
             selectFragment();
         }
 
@@ -124,11 +124,11 @@ public class MainActivity extends AppCompatActivity {
                 switch (item.getItemId()) {
 
                     case R.id.nav_userfeeds:
-                        setFragment(userFeedsFragment);
+                        setFragment(userFeedsFragment, userFeedsFragment.getTAG());
                         return true;
 
                     case R.id.nav_discover:
-                        setFragment(discoverFragment);
+                        setFragment(discoverFragment, userFeedsFragment.getTAG());
                         return true;
 
                     case R.id.nav_photo:
@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
                         return true;
 
                     case R.id.nav_profile:
-                        setFragment(profileFragment);
+                        setFragment(profileFragment, profileFragment.getTAG());
                         return true;
 
                     default:
@@ -155,13 +155,20 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void setFragment(Fragment fragment) {
+    private void setFragment(Fragment fragment, String TAG) {
         Bundle bundle = new Bundle();
         bundle.putString("uid", FirebaseAuth.getInstance().getCurrentUser().getUid());
         fragment.setArguments(bundle);
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.main_frame, fragment).addToBackStack(null);
-        fragmentTransaction.commit();
+        Fragment selectedFragment = getSupportFragmentManager().findFragmentByTag(TAG);
+
+        if (selectedFragment == null)
+            fragmentTransaction.replace(R.id.main_frame, fragment).commit();
+        else{
+            selectedFragment.setArguments(bundle);
+            fragmentTransaction.replace(R.id.main_frame, selectedFragment).commit();
+
+        }
     }
 
 
@@ -199,12 +206,12 @@ public class MainActivity extends AppCompatActivity {
      */
     @Override
     public void onBackPressed() {
-        Fragment fragment = getVisibleFragment();
-        if (fragment instanceof UserFeedsFragment) {
-            finish();
-        } else {
-            super.onBackPressed();
-        }
+//        Fragment fragment = getVisibleFragment();
+//        if (fragment instanceof UserFeedsFragment) {
+//            finish();
+//        } else {
+        super.onBackPressed();
+//        }
     }
 
     public void setBottomNavigationView() {

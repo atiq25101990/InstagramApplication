@@ -1,17 +1,18 @@
 package mobileprogramming.unimelb.com.instagramapplication;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -21,12 +22,12 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import de.hdodenhof.circleimageview.CircleImageView;
-import mobileprogramming.unimelb.com.instagramapplication.models.ModelLikes;
+import mobileprogramming.unimelb.com.instagramapplication.listener.OnItemClickListener;
+import mobileprogramming.unimelb.com.instagramapplication.utils.CommonUtils;
 import mobileprogramming.unimelb.com.instagramapplication.utils.SessionManagers;
 
 public class PostActivity extends AppCompatActivity {
@@ -57,6 +58,9 @@ public class PostActivity extends AppCompatActivity {
     @BindView(R.id.txt_likes)
     TextView textLikes;
 
+    @BindView(R.id.photoAnimationView)
+    View animView;
+
     private HashMap<String, String> userDetails;
     private FragmentManager fm;
     private String uuid;
@@ -77,7 +81,13 @@ public class PostActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post);
 
+        android.support.v7.widget.Toolbar myToolbar = findViewById(R.id.photoToolbar);
+        setSupportActionBar(myToolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+
         ButterKnife.bind(this);
+        CommonUtils.showLoadingDialog(this);
 
         userDetails = SessionManagers.getInstance().getUserDetails();
 
@@ -93,6 +103,17 @@ public class PostActivity extends AppCompatActivity {
         getComments();
 
    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:
+                this.finish();
+                return true;
+            default:
+                    return super.onOptionsItemSelected(item);
+        }
+    }
 
     private void getPostID() {
         CollectionReference postRef = db.collection("post");
@@ -143,6 +164,16 @@ public class PostActivity extends AppCompatActivity {
 
             }
         });
+
+        buttonComment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(PostActivity.this, FeedCommentsActivity.class);
+                intent.putExtra("postid", postid);
+                intent.putExtra("username", profileUserName);
+                startActivity(intent);
+            }
+        });
     }
 
 
@@ -178,7 +209,8 @@ public class PostActivity extends AppCompatActivity {
                     comments.add(queryDocumentSnapshot.getString("uid"));
 
                 }
-
+                CommonUtils.dismissProgressDialog();
+                animView.setVisibility(View.GONE);
             }
         });
     }

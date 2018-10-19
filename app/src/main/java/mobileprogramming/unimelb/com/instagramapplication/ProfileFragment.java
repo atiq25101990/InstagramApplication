@@ -44,6 +44,10 @@ public class ProfileFragment extends Fragment {
     private static final String TAG = "ProfileFragment";
     private String uuid;
 
+    public String getTAG() {
+        return TAG;
+    }
+
     @BindView(R.id.profileCircularPicture)
     CircleImageView profileCircularPicture;
     @BindView(R.id.textEditProfile)

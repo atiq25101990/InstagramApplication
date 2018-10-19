@@ -58,6 +58,10 @@ public class DiscoverFragment extends Fragment {
     @BindView(R.id.recyclerViewSuggestions)
     RecyclerView recyclerViewSuggestions;
 
+    public String getTAG() {
+        return TAG;
+    }
+
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     private UsersAdapter adapter;
     private UsersAdapterSuggest adapterSuggest;
@@ -99,6 +103,7 @@ public class DiscoverFragment extends Fragment {
         ButterKnife.bind(this, view);
         uuid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
+        CommonUtils.showLoadingDialog(getContext());
         recyclerViewSuggestions.setHasFixedSize(true);
         LinearLayoutManager horizontalLayoutManagerSug = new LinearLayoutManager(getContext(), OrientationHelper.HORIZONTAL, false);
         recyclerViewSuggestions.setLayoutManager(horizontalLayoutManagerSug);
@@ -273,7 +278,7 @@ public class DiscoverFragment extends Fragment {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 feedsSearchResult.clear();
                 for (int i = 0; i < feeds.size(); i++) {
-                    if (feeds.get(i).getUsername().contains(s.toString())) {
+                    if (feeds.get(i).getUsername().toLowerCase().contains(s.toString().toLowerCase())) {
                         feedsSearchResult.add(feeds.get(i));
                     }
                 }
@@ -288,7 +293,6 @@ public class DiscoverFragment extends Fragment {
     }
 
     private void getFollowingUsers() {
-        CommonUtils.showLoadingDialog(getContext());
         CollectionReference citiesRef = db.collection("follower");
         Query query = citiesRef.whereEqualTo("followerid", uuid).limit(100);
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -332,7 +336,6 @@ public class DiscoverFragment extends Fragment {
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                CommonUtils.dismissProgressDialog();
                 if (task.isSuccessful()) {
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         if (task.isSuccessful()) {
@@ -373,7 +376,9 @@ public class DiscoverFragment extends Fragment {
                         }
                     }
                     adapter.notifyDataSetChanged();
+                    CommonUtils.dismissProgressDialog();
                 } else {
+                    CommonUtils.dismissProgressDialog();
                     Log.d(TAG, "Error getting documents.", task.getException());
                 }
             }
@@ -390,7 +395,6 @@ public class DiscoverFragment extends Fragment {
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
-
                 if (task.isSuccessful()) {
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         if (task.isSuccessful()) {
