@@ -74,6 +74,8 @@
     <!-- Intent Extras -->
     <string name="selected_image">selected_image</string>
     <string name="string_share">Share</string>
+    <string name="selected_bitmap">selected_bitmap</string>
+    <string name="return_to_fragment">return_to_fragment</string>
 
     <!-- Firebase database fields -->
     <string name="dbname_photos">post</string>
@@ -82,7 +84,5 @@
     <!-- Photo types -->
     <string name="new_photo">new_photo</string>
     <string name="user_photo">user_photo</string>
-
-
 
 </resources>

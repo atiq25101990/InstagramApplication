@@ -4,9 +4,9 @@ public class Photo {
 
     private String caption;
     private String date_created;
-    private String image_path;
+    private String image;
     private String photo_id;
-    private String user_id;
+    private String uid;
     private String tags;
     private String username;
     private String location;
@@ -16,9 +16,9 @@ public class Photo {
     public Photo(String caption, String date_created, String image_path, String photo_id, String user_id, String tags) {
         this.caption = caption;
         this.date_created = date_created;
-        this.image_path = image_path;
+        this.image = image;
         this.photo_id = photo_id;
-        this.user_id = user_id;
+        this.uid = uid;
         this.tags = tags;
         this.username = username;
     }
@@ -41,12 +41,12 @@ public class Photo {
         this.date_created = date_created;
     }
 
-    public String getImage_path() {
-        return image_path;
+    public String getImage() {
+        return image;
     }
 
-    public void setImage_path(String image_path) {
-        this.image_path = image_path;
+    public void setImage(String image) {
+        this.image = image;
     }
 
     public String getPhoto_id() {
@@ -57,12 +57,12 @@ public class Photo {
         this.photo_id = photo_id;
     }
 
-    public String getUser_id() {
-        return user_id;
+    public String getUid() {
+        return uid;
     }
 
-    public void setUser_id(String user_id) {
-        this.user_id = user_id;
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
     public String getTags() {
@@ -94,9 +94,9 @@ public class Photo {
         return "Photo{" +
                 "caption='" + caption + '\'' +
                 ", date_created='" + date_created + '\'' +
-                ", image_path='" + image_path + '\'' +
+                ", image='" + image + '\'' +
                 ", photo_id='" + photo_id + '\'' +
-                ", user_id='" + user_id + '\'' +
+                ", uid='" + uid + '\'' +
                 ", username='" + username + '\'' +
                 ", location='" + location + '\'' +
                 ", tags='" + tags + '\'' +
