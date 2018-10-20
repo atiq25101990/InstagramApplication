@@ -177,6 +177,16 @@ public class UserFeedsFragment extends Fragment {
                                                     Log.d(TAG, "onSuccess: activity written");
                                                 }
                                             });
+                                } else {
+                                    String docID = task.getResult().getDocuments().get(0).getId();
+                                    db.collection("likes").document(docID)
+                                            .delete()
+                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    adapter.unlikeClicked(position);
+                                                }
+                                            });
                                 }
                             }
                         }
