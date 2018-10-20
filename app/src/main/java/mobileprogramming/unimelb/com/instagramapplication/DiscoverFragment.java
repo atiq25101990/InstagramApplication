@@ -295,8 +295,6 @@ public class DiscoverFragment extends Fragment {
         feedsSearchResultSuggest.clear();
         //Resume user suggestion from here..
         getFollowingUserssuggestions();
-        getFollowingUsers();
-
 
         edt_search.addTextChangedListener(new TextWatcher() {
             @Override
@@ -394,7 +392,10 @@ public class DiscoverFragment extends Fragment {
                             }
                             //If user exists in suggested list, do not add him -u.
                             if(!userExistsInSuggestedList) {
-                                feeds.add(m);
+                                if(!m.getUuid().equals(uuid)) {
+                                    Log.d("Hash: ", "Adding user: " + m.getUsername() + "->" + feedsSuggest.size());
+                                    feeds.add(m);
+                                }
                             }
 
                         }
@@ -581,7 +582,8 @@ public class DiscoverFragment extends Fragment {
                                     {
                                         if(!myFollowersHah.containsKey(keyFollwingId))
                                         {
-                                            if(!keyFollwingId.equals(uuid)) {
+                                            if(!keyFollwingId.equals(uuid))
+                                            {
                                                 feedsSuggest.add(allUsersHash.get(keyFollwingId));
                                                 isAnyNewUserAdded = true;
                                             }
@@ -612,6 +614,8 @@ public class DiscoverFragment extends Fragment {
                 }
             });
         }
+
+        getFollowingUsers();
 
         /** User's followers of follower's hasmap created
          * along with number of times a user was followed.
