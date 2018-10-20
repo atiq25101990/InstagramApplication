@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -107,10 +108,15 @@ public class UserFeedsFragment extends Fragment {
         CommonUtils.showLoadingDialog(getContext());
         uuid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
+        friendsInRange.clear();
+        getMyFriendsInRange();
+
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 feeds.clear();
+                friendsInRange.clear();
+                getMyFriendsInRange();
                 usersFollowings.clear();
                 getFollowingUsers();
             }
@@ -221,14 +227,14 @@ public class UserFeedsFragment extends Fragment {
                     @Override
                     public void onItemSelected(ItemSpinner itemSpinner) {
                         feeds.clear();
+                        getFeedsInRange(0);
                         getFeeds(itemSpinner.getId());
+
                     }
                 });
             }
         });
         feeds.clear();
-        friendsInRange.clear();
-        getMyFriendsInRange();
         getFollowingUsers();
 
     }
@@ -245,7 +251,13 @@ public class UserFeedsFragment extends Fragment {
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         if (task.isSuccessful()) {
                           //document.getData().get("uid").toString()
-                            Log.d("Range: ","Populating range with: "+document.getData().get("done_by_id").toString());
+                            //Timestamp ts = document.getTimestamp("timestamp");
+
+
+                            //Checking if within 15 minutes!
+                            long prevEventTime = System.currentTimeMillis();
+
+
                             friendsInRange.add(document.getData().get("done_by_id").toString());
                         }
                     }
@@ -285,7 +297,10 @@ public class UserFeedsFragment extends Fragment {
 
                         }
                     }
+
+                    getFeedsInRange(0);
                     getFeeds(0);
+
 
 
                 } else {
@@ -333,6 +348,8 @@ public class UserFeedsFragment extends Fragment {
 
                             for (int i = 0; i < usersFollowings.size(); i++) {
                                 if (usersFollowings.get(i).getUuid().equals(document.getData().get("uid").toString())) {
+                                    m.setRange(false);
+                                    /*
                                     if(friendsInRange.contains(document.getData().get("uid").toString()))
                                     {
                                         m.setRange(true);
@@ -340,9 +357,10 @@ public class UserFeedsFragment extends Fragment {
                                     }
                                     else
                                     {
-                                        m.setRange(false);
+
                                         Log.d("Range: ","Out range: "+document.getData().get("uid").toString());
                                     }
+                                    */
                                     feeds.add(m);
                                     break;
                                 }
@@ -361,4 +379,47 @@ public class UserFeedsFragment extends Fragment {
             }
         });
     }
+
+    private void getFeedsInRange(int id) {
+        //id ==0 for date/time
+        //id ==1 for location
+        //default id 0
+        Log.d("selected", "=>" + id);
+        Log.d("Range Size: ","Size: "+friendsInRange.size());
+        CollectionReference inRangeFriends = db.collection("freindsnearby");
+        Query query = inRangeFriends.whereEqualTo("done_for_id", uuid).limit(100);
+        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                if (task.isSuccessful()) {
+
+                    for (final QueryDocumentSnapshot document : task.getResult()) {
+                        if (task.isSuccessful()) {
+                            final Model m = new Model();
+                            m.setPostid(document.getId());
+                            m.setImage(document.getData().get("image").toString());
+                            m.setUuid(document.getData().get("done_by_id").toString());
+                            m.setUsername(document.getData().get("username").toString());
+                            m.setDate(document.getData().get("date").toString());
+                            Log.d(TAG, document.getData().get("date").toString());
+                            Log.d("Range: ","Populating pictues in range: "+document.getData().get("done_by_id").toString());
+                            m.setRange(true);
+                            feeds.add(m);
+
+                            adapter.notifyDataSetChanged();
+                            CommonUtils.dismissProgressDialog();
+                            if (mSwipeRefreshLayout.isRefreshing())
+                                mSwipeRefreshLayout.setRefreshing(false);
+                            animateChangesView.setVisibility(View.GONE);
+                        }
+                    }
+                } else {
+                    Log.d(TAG, "Error getting documents.", task.getException());
+                }
+            }
+        });
+    }
+
+
 }

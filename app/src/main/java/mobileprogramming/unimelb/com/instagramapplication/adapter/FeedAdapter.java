@@ -144,6 +144,7 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
                     if(object.isRange())
                     {
+                        imageTypeViewHolder.btn_range.setColorFilter(R.color.range_colors);
                         imageTypeViewHolder.btn_range.setImageResource(R.drawable.in_range);
                     }
                     else
