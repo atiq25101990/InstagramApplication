@@ -217,6 +217,8 @@ public class UserFeedsFragment extends Fragment {
             }
         });
         feeds.clear();
+        friendsInRange.clear();
+        getMyFriendsInRange();
         getFollowingUsers();
 
     }
@@ -233,6 +235,7 @@ public class UserFeedsFragment extends Fragment {
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         if (task.isSuccessful()) {
                           //document.getData().get("uid").toString()
+                            Log.d("Range: ","Populating range with: "+document.getData().get("done_by_id").toString());
                             friendsInRange.add(document.getData().get("done_by_id").toString());
                         }
                     }
@@ -289,6 +292,7 @@ public class UserFeedsFragment extends Fragment {
         //id ==1 for location
         //default id 0
         Log.d("selected", "=>" + id);
+        Log.d("Range Size: ","Size: "+friendsInRange.size());
         CollectionReference citiesRef = db.collection("post");
         Query query;
         if (id == 0) {
@@ -315,17 +319,20 @@ public class UserFeedsFragment extends Fragment {
                             m.setDate(document.getData().get("date").toString());
                             Log.d(TAG, document.getData().get("date").toString());
 
-                            if(friendsInRange.contains(document.getData().get("uid").toString()))
-                            {
-                                m.setRange(true);
-                            }
-                            else
-                            {
-                                m.setRange(false);
-                            }
+
 
                             for (int i = 0; i < usersFollowings.size(); i++) {
                                 if (usersFollowings.get(i).getUuid().equals(document.getData().get("uid").toString())) {
+                                    if(friendsInRange.contains(document.getData().get("uid").toString()))
+                                    {
+                                        m.setRange(true);
+                                        Log.d("Range: ","In range: "+document.getData().get("uid").toString());
+                                    }
+                                    else
+                                    {
+                                        m.setRange(false);
+                                        Log.d("Range: ","Out range: "+document.getData().get("uid").toString());
+                                    }
                                     feeds.add(m);
                                     break;
                                 }
