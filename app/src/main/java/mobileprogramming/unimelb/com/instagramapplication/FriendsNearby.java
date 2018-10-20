@@ -1,6 +1,11 @@
 package mobileprogramming.unimelb.com.instagramapplication;
 
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothManager;
 import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Canvas;
 import android.os.Bundle;
@@ -16,22 +21,6 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothManager;
-import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.os.Bundle;
-import android.os.Handler;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -45,20 +34,15 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import butterknife.BindView;
 import mobileprogramming.unimelb.com.instagramapplication.adapter.BluetoothDeviceAdapter;
-import mobileprogramming.unimelb.com.instagramapplication.adapter.UsersAdapter;
-import mobileprogramming.unimelb.com.instagramapplication.listener.OnLoadMoreListener;
-import mobileprogramming.unimelb.com.instagramapplication.listener.RecyclerViewLoadMoreScroll;
-import mobileprogramming.unimelb.com.instagramapplication.models.ModelUsers;
-import mobileprogramming.unimelb.com.instagramapplication.models.ModelUsersFollowing;
 
 public class FriendsNearby extends AppCompatActivity {
+    private static final String TAG = "FriendsNearby";
 
     private static final int REQUEST_ENABLE_BT = 1;
     private static final long SCAN_PERIOD = 10000;
     private ArrayList<String> devices = new ArrayList<>();
-    private HashMap<String,String> deviceDetails = new HashMap<>();
+    private HashMap<String, String> deviceDetails = new HashMap<>();
     private ArrayList<String> instagramUsersDevice = new ArrayList<>();
     private BluetoothDeviceAdapter bluetoothDeviceAdapter;
     BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -103,6 +87,38 @@ public class FriendsNearby extends AppCompatActivity {
         registerReceiver(mReceiver, filter);
 
         Button bluetoothSearch = (Button) findViewById(R.id.bluetoothTrigger);
+
+        //bluetoothDevices
+        RecyclerView bluetoothDevList = (RecyclerView) findViewById(R.id.bluetoothDevices);
+        bluetoothDevList.setHasFixedSize(true);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(FriendsNearby.this, OrientationHelper.VERTICAL, false);
+        bluetoothDevList.setLayoutManager(linearLayoutManager);
+        //bluetoothDevList.add("");
+        //devices.add("Test1");
+        //devices.add("Test2");
+        bluetoothDeviceAdapter = new BluetoothDeviceAdapter(FriendsNearby.this, devices);
+        bluetoothDevList.setAdapter(bluetoothDeviceAdapter);
+
+        final SwipeAnimation swipeController = new SwipeAnimation(new SwipeAnimationCallbacks() {
+            @Override
+            public void onRightClicked(int position) {
+                devices.remove(position);
+                bluetoothDeviceAdapter.notifyItemRemoved(position);
+                bluetoothDeviceAdapter.notifyItemRangeChanged(position, bluetoothDeviceAdapter.getItemCount());
+            }
+        });
+
+
+        ItemTouchHelper itemTouchhelper = new ItemTouchHelper(swipeController);
+        itemTouchhelper.attachToRecyclerView(bluetoothDevList);
+
+        bluetoothDevList.addItemDecoration(new RecyclerView.ItemDecoration() {
+            @Override
+            public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
+                swipeController.onDraw(c);
+            }
+        });
+
         bluetoothSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -128,6 +144,7 @@ public class FriendsNearby extends AppCompatActivity {
                 //Get a list of all InstaUsers Devices
                 CollectionReference usersMAC = db.collection("Users");
                 Query query = usersMAC.orderBy("username").limit(100);
+                Log.d(TAG, "onClick: Device List Size " + deviceDetails.size());
                 query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -135,57 +152,27 @@ public class FriendsNearby extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 if (task.isSuccessful()) {
-                                    //m.setFollowerid(document.getData().get("followerid").toString());
-                                    String mac = document.getData().get("MAC").toString();
+                                    String mac;
+                                    if (document.contains("MAC")) {
+                                        mac = document.getData().get("MAC").toString();
+                                        Log.d(TAG, "onComplete: Filtering mac addresses " + mac);
 
-                                    if(deviceDetails.containsKey(mac))
-                                    {
-                                        devices.add(deviceDetails.get(mac));
+                                        if (deviceDetails.containsKey(mac)) {
+                                            devices.add(deviceDetails.get(mac));
+                                            Log.d(TAG, "onComplete: Inside if condition. Adding mac: " + mac);
+                                        }
                                     }
+
+
 
                                 }
                             }
-
-                            //bluetoothDevices
-                            RecyclerView bluetoothDevList = (RecyclerView) findViewById(R.id.bluetoothDevices);
-                            bluetoothDevList.setHasFixedSize(true);
-                            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(FriendsNearby.this, OrientationHelper.VERTICAL, false);
-                            bluetoothDevList.setLayoutManager(linearLayoutManager);
-                            //bluetoothDevList.add("");
-                            //devices.add("Test1");
-                            //devices.add("Test2");
-                            bluetoothDeviceAdapter = new BluetoothDeviceAdapter(FriendsNearby.this, devices);
-                            bluetoothDevList.setAdapter(bluetoothDeviceAdapter);
+                            devices.add("This is a test device");
+                            bluetoothDeviceAdapter.notifyDataSetChanged();
                         }
 
                     }
                 });
-
-
-
-
-                final SwipeAnimation swipeController = new SwipeAnimation(new SwipeAnimationCallbacks() {
-                    @Override
-                    public void onRightClicked(int position) {
-                        devices.remove(position);
-                        bluetoothDeviceAdapter.notifyItemRemoved(position);
-                        bluetoothDeviceAdapter.notifyItemRangeChanged(position, bluetoothDeviceAdapter.getItemCount());
-                    }
-                });
-
-
-                ItemTouchHelper itemTouchhelper = new ItemTouchHelper(swipeController);
-                itemTouchhelper.attachToRecyclerView(bluetoothDevList);
-
-                bluetoothDevList.addItemDecoration(new RecyclerView.ItemDecoration() {
-                    @Override
-                    public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
-                        swipeController.onDraw(c);
-                    }
-                });
-
-
-
 
 
             }
@@ -198,14 +185,8 @@ public class FriendsNearby extends AppCompatActivity {
             if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                 BluetoothDevice device = intent
                         .getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                //devices.add(device.getAddress());
-                deviceDetails.put(device.getAddress(),device.getName());
-                Log.d("BT1", device.getName() + "\n" + device.getAddress());
-                //listView.setAdapter(new ArrayAdapter<String>(context,
-                        //android.R.layout.simple_list_item_1, mDeviceList));
-                //bluetoothDeviceAdapter.notifyDataSetChanged();
-
-
+                deviceDetails.put(device.getAddress(), device.getName());
+                Log.d(TAG, device.getName() + "\n" + device.getAddress());
             }
         }
     };

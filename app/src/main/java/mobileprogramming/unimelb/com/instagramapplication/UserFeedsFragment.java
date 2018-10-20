@@ -121,6 +121,7 @@ public class UserFeedsFragment extends Fragment {
                 getFollowingUsers();
             }
         });
+
         userDetails = SessionManagers.getInstance().getUserDetails();
         recyclerView.setHasFixedSize(true);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), OrientationHelper.VERTICAL, false);
@@ -135,6 +136,7 @@ public class UserFeedsFragment extends Fragment {
             }
         });
         recyclerView.addOnScrollListener(scrollListener);
+
         adapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(final int position, int in) {
@@ -165,7 +167,7 @@ public class UserFeedsFragment extends Fragment {
                                     activity.put("done_for_id", feeds.get(position).getUuid());
                                     activity.put("done_for_name", done_for_name);
                                     activity.put("date", Calendar.getInstance().getTime());
-                                    activity.put("type", "Follow");
+                                    activity.put("type", "Like");
                                     db.collection("likes")
                                             .add(likeObject)
                                             .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
@@ -297,7 +299,7 @@ public class UserFeedsFragment extends Fragment {
 
                         }
                     }
-
+                    Log.d(TAG, "onComplete: Following users are: " + usersFollowings.size());
                     getFeedsInRange(0);
                     getFeeds(0);
 
@@ -319,12 +321,12 @@ public class UserFeedsFragment extends Fragment {
         Log.d("selected", "=>" + id);
         Log.d("Range Size: ","Size: "+friendsInRange.size());
         CollectionReference citiesRef = db.collection("post");
-        Query query;
-        if (id == 0) {
-            query = citiesRef.orderBy("date", Query.Direction.DESCENDING).limit(100);
-        } else {
-            query = citiesRef.orderBy("location", Query.Direction.ASCENDING).limit(100);
-        }
+        Query query = citiesRef;
+//        if (id == 0) {
+//            query = citiesRef.orderBy("date", Query.Direction.DESCENDING).limit(100);
+//        } else {
+//            query = citiesRef.orderBy("location", Query.Direction.ASCENDING).limit(100);
+//        }
         //please make change as per requirement in future
         //Query query = citiesRef.orderBy("date", Query.Direction.DESCENDING).orderBy("location",Query.Direction.ASCENDING).limit(100);
 
@@ -336,13 +338,19 @@ public class UserFeedsFragment extends Fragment {
 
                     for (final QueryDocumentSnapshot document : task.getResult()) {
                         if (task.isSuccessful()) {
+                            Log.d(TAG, "onComplete: Fetched Posts");
                             final Model m = new Model();
+
                             m.setPostid(document.getId());
                             m.setImage(document.getData().get("image").toString());
                             m.setUuid(document.getData().get("uid").toString());
-                            m.setUsername(document.getData().get("username").toString());
                             m.setDate(document.getData().get("date").toString());
                             Log.d(TAG, document.getData().get("date").toString());
+                            try {
+                                m.setUsername(String.valueOf(document.getData().get("username")));
+                            } catch (Exception e){
+                                Log.d(TAG, "onComplete: username null");
+                            }
 
 
 
@@ -367,7 +375,6 @@ public class UserFeedsFragment extends Fragment {
                             }
 
                             adapter.notifyDataSetChanged();
-                            CommonUtils.dismissProgressDialog();
                             if (mSwipeRefreshLayout.isRefreshing())
                                 mSwipeRefreshLayout.setRefreshing(false);
                             animateChangesView.setVisibility(View.GONE);
@@ -376,6 +383,8 @@ public class UserFeedsFragment extends Fragment {
                 } else {
                     Log.d(TAG, "Error getting documents.", task.getException());
                 }
+
+                CommonUtils.dismissProgressDialog();
             }
         });
     }

@@ -147,7 +147,7 @@ public class FirebaseMethods {
         Log.d(TAG,"addPhotoToDatabase: adding photo to database");
 
         String user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        String username = getUsername(user_id);
+        String username = SessionManagers.getInstance().getUserDetails().get(Constant.KEY_UNAME);
 
         // Setup up the inrange model to be written
         String newPhotoKey = myRef.child(mContext.getString(R.string.dbname_photos)).push().getKey();
@@ -181,23 +181,21 @@ public class FirebaseMethods {
         Log.d(TAG,"addPhotoToDatabase: adding photo to database");
 
         String user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        String username = getUsername(user_id);
+        String username = SessionManagers.getInstance().getUserDetails().get(Constant.KEY_UNAME);
+
 
         String tags = StringManipulation.getTags(caption);
         String newPhotoKey = myRef.child(mContext.getString(R.string.dbname_photos)).push().getKey();
         Photo photo = new Photo();
         photo.setCaption(caption);
-        photo.setDate_created(getTimestamp());
+        photo.setDate(getTimestamp());
         photo.setImage(url);
         photo.setTags(tags);
         photo.setUid(user_id);
         photo.setUsername(username);
         photo.setPhoto_id(newPhotoKey);
         photo.setLocation(photoLocation);
-
-        //myRef.child(mContext.getString(R.string.dbname_user_photos)).child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child(newPhotoKey).setValue(photo);
-        //myRef.child(mContext.getString(R.string.dbname_photos)).child(newPhotoKey).setValue(photo);
-
+        
         //insert into database
         mFirestore.collection("post").document(newPhotoKey).set(photo).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
@@ -223,57 +221,5 @@ public class FirebaseMethods {
         }
         return count;
     }
-
-
-    public String getUsername(final String userID) {
-        Log.d(TAG, "getUsername: getting username");
-
-        final String[] username = new String[1];
-        myRef = FirebaseDatabase.getInstance().getReference().child("Users");
-
-        ValueEventListener postListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                // Get Post object and use the values to update the UI
-                for(DataSnapshot userDetailList : dataSnapshot.getChildren()) {
-                    Model userDetails = userDetailList.getValue(Model.class);
-                    if(userDetails.getUuid().toString().equals(userID.toString()))
-                        username[0] = userDetails.getUsername().toString();
-                    Toast.makeText(mContext, "Username " + username[0], Toast.LENGTH_LONG).show();
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                // Getting Post failed, log a message
-                Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
-                // ...
-            }
-        };
-        myRef.addValueEventListener(postListener);
-
-
-        /*final String[] username = new String[1];
-        DatabaseReference userDetail = myRef.child("Users").child(mAuth.getCurrentUser().getUid());
-        userDetail.child("UsersTable").child(userDetail.toString()).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.exists())
-                {
-                    for(DataSnapshot userDetailList : dataSnapshot.getChildren()) {
-                        //Log.d(TAG, "valueName:", + userDetailList.child("Name").getValue().toString());
-                        username[0] = userDetailList.child("Name").getValue().toString();
-                    }
-                }
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });*/
-
-        return username[0];
-    }
-
 
 }

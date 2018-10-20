@@ -3,7 +3,7 @@ package mobileprogramming.unimelb.com.instagramapplication.models;
 public class Photo {
 
     private String caption;
-    private String date_created;
+    private String date;
     private String image;
     private String photo_id;
     private String uid;
@@ -13,9 +13,9 @@ public class Photo {
 
     public Photo(){}
 
-    public Photo(String caption, String date_created, String image_path, String photo_id, String user_id, String tags) {
+    public Photo(String caption, String date, String image_path, String photo_id, String user_id, String tags) {
         this.caption = caption;
-        this.date_created = date_created;
+        this.date = date;
         this.image = image;
         this.photo_id = photo_id;
         this.uid = uid;
@@ -33,12 +33,12 @@ public class Photo {
         this.caption = caption;
     }
 
-    public String getDate_created() {
-        return date_created;
+    public String getDate() {
+        return date;
     }
 
-    public void setDate_created(String date_created) {
-        this.date_created = date_created;
+    public void setDate(String date) {
+        this.date = date;
     }
 
     public String getImage() {
@@ -93,7 +93,7 @@ public class Photo {
     public String toString() {
         return "Photo{" +
                 "caption='" + caption + '\'' +
-                ", date='" + date_created + '\'' +
+                ", date='" + date + '\'' +
                 ", image='" + image + '\'' +
                 ", photo_id='" + photo_id + '\'' +
                 ", uid='" + uid + '\'' +

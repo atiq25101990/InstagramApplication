@@ -260,7 +260,7 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                             if (task.isSuccessful()) {
                                 Log.d("fromadpter", task.toString());
                                 dataSet.get(listPosition).setLikes(task.getResult().size());
-                                imageTypeViewHolder.txt_likes.setText(String.valueOf(object.getLikes()) + " Total likes");
+                                imageTypeViewHolder.txt_likes.setText(String.valueOf(object.getLikes()) + " likes");
                             }
 
 

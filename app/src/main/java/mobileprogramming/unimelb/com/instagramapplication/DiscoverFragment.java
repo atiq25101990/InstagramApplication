@@ -33,6 +33,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.WriteBatch;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Comparator;
@@ -48,6 +49,8 @@ import mobileprogramming.unimelb.com.instagramapplication.listener.RecyclerViewL
 import mobileprogramming.unimelb.com.instagramapplication.models.ModelUsers;
 import mobileprogramming.unimelb.com.instagramapplication.models.ModelUsersFollowing;
 import mobileprogramming.unimelb.com.instagramapplication.utils.CommonUtils;
+import mobileprogramming.unimelb.com.instagramapplication.utils.Constant;
+import mobileprogramming.unimelb.com.instagramapplication.utils.SessionManagers;
 
 public class DiscoverFragment extends Fragment {
 
@@ -194,8 +197,25 @@ public class DiscoverFragment extends Fragment {
                     Map<String, Object> user = new HashMap<>();
                     user.put("followerid", uuid);
                     user.put("uid", feeds.get(position).getUuid());
-                    //data2.put("regions", Arrays.asList("west_coast", "socal"));
-                    //user.put("username", feeds.get(position).getUsername());
+                    user.put("date", Calendar.getInstance().getTime());
+
+                    HashMap<String, String> activity = new HashMap<>();
+                    activity.put("done_by_id", uuid);
+                    activity.put("done_by_name", SessionManagers.getInstance().getUserDetails().get(Constant.KEY_UNAME));
+                    activity.put("done_for_id", feeds.get(position).getUuid());
+                    activity.put("done_for_name", feeds.get(position).getUsername());
+                    activity.put("type", "Follow");
+                    activity.put("date", String.valueOf(Calendar.getInstance().getTime()));
+
+                    db.collection("activity")
+                            .add(activity)
+                            .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                @Override
+                                public void onSuccess(DocumentReference documentReference) {
+                                    Log.d(TAG, "onSuccess: activity written");
+                                }
+                            });
+
                     db.collection("follower")
                             .add(user)
                             .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
@@ -231,6 +251,25 @@ public class DiscoverFragment extends Fragment {
                             } else {
                                 Log.d(TAG, "Error getting documents.", task.getException());
                             }
+                        }
+                    });
+
+                    Query activityQuery = db.collection("activity")
+                            .whereEqualTo("done_by_id", uuid)
+                            .whereEqualTo("done_for_id", feeds.get(position).getUuid())
+                            .whereEqualTo("type", "Follow");
+
+                    activityQuery.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                        @Override
+                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                            String docID = queryDocumentSnapshots.getDocuments().get(0).getId();
+
+                            db.collection("activity").document(docID).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Log.d(TAG, "onSuccess: Activity deleted.");
+                                }
+                            });
                         }
                     });
 

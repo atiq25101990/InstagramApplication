@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,7 +23,7 @@ import mobileprogramming.unimelb.com.instagramapplication.utils.Permissions;
  */
 public class PhotoFragment extends Fragment{
 
-    private final String type;
+    private String type;
 
     public static String getTAG() {
         return TAG;
@@ -38,8 +39,11 @@ public class PhotoFragment extends Fragment{
 
     public PhotoFragment() {
         // Required empty public constructor
+    }
 
-        Bundle bundle = getArguments();
+
+    @Override
+    public void setArguments(@Nullable Bundle bundle) {
         type = bundle.getString("type");
 
         assert type != null;
@@ -47,7 +51,6 @@ public class PhotoFragment extends Fragment{
             inRange = bundle.getStringArray("users");
         }
     }
-
 
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container,
@@ -110,6 +113,7 @@ public class PhotoFragment extends Fragment{
                     Log.d(TAG, "onActivityResult: received new bitmap from camera: " + bitmap);
                     Intent intent = new Intent(getActivity(), PhotoEditingActivity.class);
                     intent.putExtra(getString(R.string.selected_bitmap), bitmap);
+                    intent.putExtra("type", type);
                     startActivity(intent);
                 }catch (NullPointerException e){
                     Log.d(TAG, "onActivityResult: NullPointerException: " + e.getMessage());

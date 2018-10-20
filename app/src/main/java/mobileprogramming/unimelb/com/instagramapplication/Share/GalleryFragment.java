@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.media.Image;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -56,15 +57,20 @@ public class GalleryFragment extends Fragment {
 
 
     public GalleryFragment(){
-        Bundle bundle = getArguments();
+
+    }
+
+    @Override
+    public void setArguments(@Nullable Bundle bundle) {
         type = bundle.getString("type");
+
+
 
         assert type != null;
         if(type.equals("inrange")){
             inRange = bundle.getStringArray("users");
         }
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
