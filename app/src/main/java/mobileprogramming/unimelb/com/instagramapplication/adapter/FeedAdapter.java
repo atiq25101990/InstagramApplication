@@ -276,6 +276,11 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         notifyItemChanged(pos);
     }
 
+    public void unlikeClicked(int pos) {
+        dataSet.get(pos).setLikes(dataSet.get(pos).getLikes() - 1);
+        notifyItemChanged(pos);
+    }
+
     public static class ImageTypeViewHolder extends RecyclerView.ViewHolder {
         AppCompatImageView post_image;
         TextView txt_likes;
