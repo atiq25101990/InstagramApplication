@@ -56,6 +56,8 @@ public class ShareActivity extends AppCompatActivity {
 
         Bundle bundle = new Bundle();
         bundle.putString("type", type);
+        if(type.equals("inrange"))
+            bundle.putStringArray("users", getIntent().getStringArrayExtra("users"));
 
         Fragment galleryFragment = new GalleryFragment();
         galleryFragment.setArguments(bundle);

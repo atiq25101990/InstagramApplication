@@ -24,6 +24,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -34,6 +35,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import mobileprogramming.unimelb.com.instagramapplication.Share.ShareActivity;
 import mobileprogramming.unimelb.com.instagramapplication.adapter.BluetoothDeviceAdapter;
 
 public class FriendsNearby extends AppCompatActivity {
@@ -102,9 +104,21 @@ public class FriendsNearby extends AppCompatActivity {
         final SwipeAnimation swipeController = new SwipeAnimation(new SwipeAnimationCallbacks() {
             @Override
             public void onRightClicked(int position) {
-                devices.remove(position);
-                bluetoothDeviceAdapter.notifyItemRemoved(position);
-                bluetoothDeviceAdapter.notifyItemRangeChanged(position, bluetoothDeviceAdapter.getItemCount());
+                String deviceMAC = devices.get(position);
+                db.collection("Users")
+                        .whereEqualTo("MAC", deviceMAC)
+                        .get()
+                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        String[] inrange = new String[1];
+                        inrange[0] = queryDocumentSnapshots.getDocuments().get(0).getId();
+                        Intent intent = new Intent(FriendsNearby.this, ShareActivity.class);
+                        intent.putExtra("type", "inrange");
+                        intent.putExtra("users", inrange);
+                        startActivity(intent);
+                    }
+                });
             }
         });
 
@@ -158,7 +172,7 @@ public class FriendsNearby extends AppCompatActivity {
                                         Log.d(TAG, "onComplete: Filtering mac addresses " + mac);
 
                                         if (deviceDetails.containsKey(mac)) {
-                                            devices.add(deviceDetails.get(mac));
+                                            devices.add(mac);
                                             Log.d(TAG, "onComplete: Inside if condition. Adding mac: " + mac);
                                         }
                                     }
@@ -167,7 +181,6 @@ public class FriendsNearby extends AppCompatActivity {
 
                                 }
                             }
-                            devices.add("This is a test device");
                             bluetoothDeviceAdapter.notifyDataSetChanged();
                         }
 

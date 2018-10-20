@@ -195,7 +195,7 @@ public class FirebaseMethods {
         photo.setUsername(username);
         photo.setPhoto_id(newPhotoKey);
         photo.setLocation(photoLocation);
-        
+
         //insert into database
         mFirestore.collection("post").document(newPhotoKey).set(photo).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override

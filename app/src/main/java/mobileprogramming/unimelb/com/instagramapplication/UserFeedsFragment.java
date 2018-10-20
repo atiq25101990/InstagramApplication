@@ -7,7 +7,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.OrientationHelper;
@@ -21,7 +20,6 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -72,10 +70,6 @@ public class UserFeedsFragment extends Fragment {
     private RecyclerViewLoadMoreScroll scrollListener;
     private FragmentManager fm;
 
-
-    @BindView(R.id.swipeRefresh)
-    SwipeRefreshLayout mSwipeRefreshLayout;
-
     public String getTAG() {
         return TAG;
     }
@@ -111,16 +105,6 @@ public class UserFeedsFragment extends Fragment {
         friendsInRange.clear();
         getMyFriendsInRange();
 
-        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                feeds.clear();
-                friendsInRange.clear();
-                getMyFriendsInRange();
-                usersFollowings.clear();
-                getFollowingUsers();
-            }
-        });
 
         userDetails = SessionManagers.getInstance().getUserDetails();
         recyclerView.setHasFixedSize(true);
@@ -353,30 +337,21 @@ public class UserFeedsFragment extends Fragment {
                             }
 
 
-
-                            for (int i = 0; i < usersFollowings.size(); i++) {
-                                if (usersFollowings.get(i).getUuid().equals(document.getData().get("uid").toString())) {
-                                    m.setRange(false);
-                                    /*
-                                    if(friendsInRange.contains(document.getData().get("uid").toString()))
-                                    {
-                                        m.setRange(true);
-                                        Log.d("Range: ","In range: "+document.getData().get("uid").toString());
+                            if(uuid.equals(document.getData().get("uid").toString())){
+                                m.setRange(false);
+                                feeds.add(m);
+                            } else {
+                                for (int i = 0; i < usersFollowings.size(); i++) {
+                                    if (usersFollowings.get(i).getUuid().equals(document.getData().get("uid").toString())) {
+                                        m.setRange(false);
+                                        feeds.add(m);
+                                        break;
                                     }
-                                    else
-                                    {
-
-                                        Log.d("Range: ","Out range: "+document.getData().get("uid").toString());
-                                    }
-                                    */
-                                    feeds.add(m);
-                                    break;
                                 }
                             }
 
+
                             adapter.notifyDataSetChanged();
-                            if (mSwipeRefreshLayout.isRefreshing())
-                                mSwipeRefreshLayout.setRefreshing(false);
                             animateChangesView.setVisibility(View.GONE);
                         }
                     }
@@ -418,8 +393,6 @@ public class UserFeedsFragment extends Fragment {
 
                             adapter.notifyDataSetChanged();
                             CommonUtils.dismissProgressDialog();
-                            if (mSwipeRefreshLayout.isRefreshing())
-                                mSwipeRefreshLayout.setRefreshing(false);
                             animateChangesView.setVisibility(View.GONE);
                         }
                     }

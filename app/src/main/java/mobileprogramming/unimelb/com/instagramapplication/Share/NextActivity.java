@@ -76,7 +76,7 @@ public class NextActivity extends AppCompatActivity {
 
         assert type != null;
         if(type.equals("inrange")){
-            inRange = intent.getStringArrayExtra("users");
+            inRange = thisIntent.getStringArrayExtra("users");
         }
 
         if(checkPermissionsArray(Permissions.PERMISSIONS)){
