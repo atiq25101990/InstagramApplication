@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
         mMainNav = (BottomNavigationView) findViewById(R.id.main_nav);
 
         userFeedsFragment = UserFeedsFragment.newInstance();
-        discoverFragment = DiscoverFragment.newInstance();
+        discoverFragment = new DiscoverFragment();
         photoFragment = new PhotoFragment();
         profileFragment = ProfileFragment.newInstance();
 
