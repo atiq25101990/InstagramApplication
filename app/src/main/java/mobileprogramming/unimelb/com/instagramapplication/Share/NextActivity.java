@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -129,7 +130,8 @@ public class NextActivity extends AppCompatActivity {
                     imgUrl = intent.getStringExtra(getString(R.string.selected_image));
                     mFirebaseMethods.uploadNewPhoto(getString(R.string.new_photo), caption, imageCount, imgUrl, null, currentLocation.toString());
                 }else if(intent.hasExtra(getString(R.string.selected_bitmap))){
-                    bitmap = (Bitmap) intent.getParcelableExtra(getString(R.string.selected_bitmap));
+                    byte[] byteArray = intent.getByteArrayExtra(getString(R.string.selected_bitmap));
+                    bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
                     mFirebaseMethods.uploadNewPhoto(getString(R.string.new_photo), caption, imageCount, null, bitmap, currentLocation.toString());
                 }
 
@@ -167,7 +169,8 @@ public class NextActivity extends AppCompatActivity {
             Log.d(TAG, "setImage: got new image: " +imgUrl);
             UniversalImageLoader.setImage(imgUrl, image, null, mAppend);
         }else if(intent.hasExtra(getString(R.string.selected_bitmap))){
-            bitmap = (Bitmap) intent.getParcelableExtra(getString(R.string.selected_bitmap));
+            byte[] byteArray = intent.getByteArrayExtra(getString(R.string.selected_bitmap));
+            bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
             Log.d(TAG, "setImage: got new bitmap");
             image.setImageBitmap(bitmap);
         }

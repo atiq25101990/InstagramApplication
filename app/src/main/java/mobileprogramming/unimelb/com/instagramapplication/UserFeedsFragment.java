@@ -148,7 +148,7 @@ public class UserFeedsFragment extends Fragment {
                                     final String done_for_id = feeds.get(position).getUuid();
 
                                     likeObject.put("postid", feeds.get(position).getPostid());
-                                    likeObject.put("uid", feeds.get(position).getUuid());
+                                    likeObject.put("uid", uuid);
                                     likeObject.put("username", userDetails.get(Constant.KEY_UNAME));
                                     likeObject.put("date", Calendar.getInstance().getTime());
                                     Map<String, Object> activity = new HashMap<>();

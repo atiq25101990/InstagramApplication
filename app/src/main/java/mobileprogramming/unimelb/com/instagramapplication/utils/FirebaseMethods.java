@@ -30,6 +30,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.UUID;
 
 import mobileprogramming.unimelb.com.instagramapplication.MainActivity;
 import mobileprogramming.unimelb.com.instagramapplication.R;
@@ -77,16 +78,14 @@ public class FirebaseMethods {
         if(photoType.equals(mContext.getString(R.string.new_photo))){
             Log.d(TAG, "uploadNewPhoto: uploading new photo.");
 
+            byte[] bytes = ImageManager.getBytesFromBitmap(bm, 100);
+
             String user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
             Toast.makeText(mContext, "uploadNewPhoto: Count " +count, Toast.LENGTH_LONG).show();
             StorageReference storageReference = mStorageReference
-                    .child(filePaths.FIREBASE_IMAGE_STORAGE + "/" + user_id + "/photo" + (count + 1));
+                    .child(filePaths.FIREBASE_IMAGE_STORAGE + "/" + user_id + "/" + UUID.nameUUIDFromBytes(bytes));
 
-            //convert image url to bitmap
-            if(bm == null){
-                bm = ImageManager.getBitmap(imgUrl);
-            }
-            byte[] bytes = ImageManager.getBytesFromBitmap(bm, 100);
+
 
             UploadTask uploadTask = null;
             uploadTask = storageReference.putBytes(bytes);
@@ -190,8 +189,8 @@ public class FirebaseMethods {
         int count = 0;
         for(DataSnapshot ds: dataSnapshot
                 .child(mContext.getString(R.string.dbname_photos))
-                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .getChildren()){
+            if(ds.child(mContext.getString(R.string.text_uid)).getValue().equals(FirebaseAuth.getInstance().getCurrentUser().getUid()))
             count++;
         }
         return count;

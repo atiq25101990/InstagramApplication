@@ -9,22 +9,72 @@
     <ja.burhanrashid52.photoeditor.PhotoEditorView
         android:id="@+id/photoEditorView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="350dp" />
 
-
-    <Button
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAlignment="center"
+        android:text="Brightness"
+        android:padding="16dp"
+        android:textSize="16sp" />
+
+    <SeekBar
         android:id="@+id/brightnessButton"
-        android:text="Brightness"/>
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="100"
+        android:progress="50"
+        android:padding="16dp" />
 
-
-    <Button
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAlignment="center"
+        android:text="Contrast"
+        android:padding="16dp"
+        android:textSize="16sp" />
+
+    <SeekBar
         android:id="@+id/contrastButton"
-        android:text="Contrast"/>
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="100"
+        android:progress="50"
+        android:padding="16dp"/>
+    
+    <LinearLayout
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageButton
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:id="@+id/sepiaFilter"
+            android:layout_height="wrap_content"
+            android:src="@drawable/default_profile_picture"/>
+
+        <ImageButton
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:id="@+id/bwFilter"
+            android:layout_height="wrap_content"
+            android:src="@drawable/default_profile_picture"/>
+
+        <ImageButton
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:id="@+id/vignetteFilter"
+            android:layout_height="wrap_content"
+            android:src="@drawable/default_profile_picture"/>
+    </LinearLayout>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="18dp"
+        android:id="@+id/filterDoneButton"
+        android:text="Next"
+        android:textAlignment="center"
+        android:padding="8dp"/>
 
 </LinearLayout>
