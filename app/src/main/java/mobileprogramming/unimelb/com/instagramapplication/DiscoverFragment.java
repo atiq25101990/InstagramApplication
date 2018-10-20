@@ -34,9 +34,9 @@ import com.google.firebase.firestore.WriteBatch;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Comparator;
 import java.util.TreeMap;
 
 import butterknife.BindView;
@@ -71,9 +71,9 @@ public class DiscoverFragment extends Fragment {
     private ArrayList<ModelUsersFollowing> usersFollowings = new ArrayList<>();
     private ArrayList<ModelUsersFollowing> myFollowers = new ArrayList<>();
     private ArrayList<ModelUsers> allUsers = new ArrayList<>();
-    public HashMap<String,ModelUsers> allUsersHash = new HashMap<>();
-    public HashMap<String,Integer> followersOfFollersOccurences = new HashMap<>();
-    public HashMap<String,String> myFollowersHah = new HashMap<>();
+    public HashMap<String, ModelUsers> allUsersHash = new HashMap<>();
+    public HashMap<String, Integer> followersOfFollersOccurences = new HashMap<>();
+    public HashMap<String, String> myFollowersHah = new HashMap<>();
     private View view;
     private RecyclerViewLoadMoreScroll scrollListener;
     private FragmentManager fm;
@@ -170,9 +170,6 @@ public class DiscoverFragment extends Fragment {
         });
 
 
-
-
-
         mDiscoverRecyclerView.setHasFixedSize(true);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), OrientationHelper.VERTICAL, false);
         mDiscoverRecyclerView.setLayoutManager(linearLayoutManager);
@@ -265,14 +262,17 @@ public class DiscoverFragment extends Fragment {
                     activityQuery.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                         @Override
                         public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                            String docID = queryDocumentSnapshots.getDocuments().get(0).getId();
+                            String docID;
+                            if (queryDocumentSnapshots.getDocuments().size() > 0){
+                                docID = queryDocumentSnapshots.getDocuments().get(0).getId();
+                                db.collection("activity").document(docID).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Log.d(TAG, "onSuccess: Activity deleted.");
+                                    }
+                                });
+                            }
 
-                            db.collection("activity").document(docID).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    Log.d(TAG, "onSuccess: Activity deleted.");
-                                }
-                            });
                         }
                     });
 
@@ -293,7 +293,8 @@ public class DiscoverFragment extends Fragment {
         usersFollowings.clear();
         myFollowers.clear();
         followersOfFollersOccurences.clear();
-        myFollowersHah.clear();;
+        myFollowersHah.clear();
+        ;
         feedsSearchResult.clear();
         feedsSearchResultSuggest.clear();
         //Resume user suggestion from here..
@@ -394,8 +395,8 @@ public class DiscoverFragment extends Fragment {
                                 }
                             }
                             //If user exists in suggested list, do not add him -u.
-                            if(!userExistsInSuggestedList) {
-                                if(!m.getUuid().equals(uuid)) {
+                            if (!userExistsInSuggestedList) {
+                                if (!m.getUuid().equals(uuid)) {
                                     Log.d("Hash: ", "Adding user: " + m.getUsername() + "->" + feedsSuggest.size());
                                     feeds.add(m);
                                 }
@@ -431,7 +432,7 @@ public class DiscoverFragment extends Fragment {
                             m.setUuid(document.getData().get("uid").toString());
                             m.setFollowerid(document.getData().get("followerid").toString());
                             myFollowers.add(m);
-                            myFollowersHah.put(document.getData().get("uid").toString(),uuid);
+                            myFollowersHah.put(document.getData().get("uid").toString(), uuid);
                         }
                     }
                 }
@@ -453,7 +454,7 @@ public class DiscoverFragment extends Fragment {
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 //CommonUtils.dismissProgressDialog();
                 if (task.isSuccessful()) {
-                    int someCount= 0;
+                    int someCount = 0;
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         if (task.isSuccessful()) {
                             final ModelUsers m = new ModelUsers();
@@ -473,8 +474,7 @@ public class DiscoverFragment extends Fragment {
                                      * in search list, as per instagram's orignal
                                      * behaviour. --(M. Umair)
                                      */
-                                    if(uuid.equals(m.getUuid()))
-                                    {
+                                    if (uuid.equals(m.getUuid())) {
                                         continue;
                                     }
                                     //TODO-Implement suggestionalgohere.All else ready
@@ -512,24 +512,23 @@ public class DiscoverFragment extends Fragment {
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 //CommonUtils.dismissProgressDialog();
                 if (task.isSuccessful()) {
-                    int someCount= 0;
+                    int someCount = 0;
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         if (task.isSuccessful()) {
                             final ModelUsers m = new ModelUsers();
                             m.setUuid(document.getId());
                             m.setUsername(document.getData().get("username").toString());
                             m.setImage(document.getData().get("image").toString());
-                            Log.d("Sequence","S1");
+                            Log.d("Sequence", "S1");
                             allUsers.add(m);
-                            allUsersHash.put(document.getId(),m);
+                            allUsersHash.put(document.getId(), m);
                         }
 
                     }
 
                     //feedsSearchResultSuggest.addAll(feedsSuggest);
                     //adapterSuggest.notifyDataSetChanged();
-                }
-                else {
+                } else {
                     Log.d(TAG, "Error getting documents.", task.getException());
                 }
 
@@ -547,20 +546,18 @@ public class DiscoverFragment extends Fragment {
     }
 
 
-    private void getFollowersOfFollowers()
-    {
+    private void getFollowersOfFollowers() {
         //Get followers of follwers and add them in hashmap.
-        for (int i=0; i<myFollowers.size(); i++)
-        {
+        for (int i = 0; i < myFollowers.size(); i++) {
             CollectionReference citiesRef = db.collection("follower");
             Query query = citiesRef.whereEqualTo("followerid", myFollowers.get(i).getUuid()).limit(100);
             //Query query = citiesRef.whereGreaterThan("followerid",uuid);
             query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                    int follower=0;
-                    String keyFollwingIdG="";
-                    boolean isAnyNewUserAdded=false;
+                    int follower = 0;
+                    String keyFollwingIdG = "";
+                    boolean isAnyNewUserAdded = false;
                     if (task.isSuccessful()) {
 
                         //followersOfFollersOccurences.clear();
@@ -570,23 +567,17 @@ public class DiscoverFragment extends Fragment {
                                 String keyFollwingId = document.getData().get("uid").toString();
                                 String keyFollwerId = document.getData().get("followerid").toString();
                                 follower++;
-                                keyFollwingIdG=keyFollwerId;
-                                if (followersOfFollersOccurences.containsKey(keyFollwingId))
-                                {
+                                keyFollwingIdG = keyFollwerId;
+                                if (followersOfFollersOccurences.containsKey(keyFollwingId)) {
                                     //Increment count by one on this key.
                                     followersOfFollersOccurences.put(keyFollwingId, followersOfFollersOccurences.get(keyFollwingId) + 1);
-                                }
-                                else
-                                {
+                                } else {
                                     //Else just add this foller of follower as is an instantiat the count to 1.
                                     followersOfFollersOccurences.put(keyFollwingId, 1);
 
-                                    if(!feedsSuggest.contains(allUsersHash.get(keyFollwingId)))
-                                    {
-                                        if(!myFollowersHah.containsKey(keyFollwingId))
-                                        {
-                                            if(!keyFollwingId.equals(uuid))
-                                            {
+                                    if (!feedsSuggest.contains(allUsersHash.get(keyFollwingId))) {
+                                        if (!myFollowersHah.containsKey(keyFollwingId)) {
+                                            if (!keyFollwingId.equals(uuid)) {
                                                 feedsSuggest.add(allUsersHash.get(keyFollwingId));
                                                 isAnyNewUserAdded = true;
                                             }
@@ -598,21 +589,20 @@ public class DiscoverFragment extends Fragment {
                                 }
 
 
-
                             }
                         }
                     }
                     //Do something after iterating this user's followers. For now move to the next one.
-                    Log.d("Hash: ","User: "+keyFollwingIdG+" has "+follower);
-                    if(isAnyNewUserAdded) {
-                        Log.d("Hash: ","User: "+keyFollwingIdG+" has "+follower);
+                    Log.d("Hash: ", "User: " + keyFollwingIdG + " has " + follower);
+                    if (isAnyNewUserAdded) {
+                        Log.d("Hash: ", "User: " + keyFollwingIdG + " has " + follower);
 
-                        if(feedsSearchResultSuggest.size()>0){
+                        if (feedsSearchResultSuggest.size() > 0) {
                             feedsSearchResultSuggest.clear();
                         }
                         feedsSearchResultSuggest.addAll(feedsSuggest);
                         adapterSuggest.notifyDataSetChanged();
-                        isAnyNewUserAdded=false;
+                        isAnyNewUserAdded = false;
                     }
                 }
             });
@@ -651,7 +641,7 @@ public class DiscoverFragment extends Fragment {
     }
 
     public static <K, V extends Comparable<V>> Map<K, V> sortByValues(final Map<K, V> map) {
-        Comparator<K> valueComparator =  new Comparator<K>() {
+        Comparator<K> valueComparator = new Comparator<K>() {
             public int compare(K k1, K k2) {
                 int compare = map.get(k2).compareTo(map.get(k1));
                 if (compare == 0) return 1;
@@ -662,7 +652,6 @@ public class DiscoverFragment extends Fragment {
         sortedByValues.putAll(map);
         return sortedByValues;
     }
-
 
 
 }
