@@ -60,7 +60,7 @@
 
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="105dp"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
         android:orientation="horizontal">
@@ -79,6 +79,15 @@
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="12dp"
             android:src="@drawable/comment_icon"
+            android:tint="@color/colorPrimaryDark" />
+
+        <ImageView
+            android:id="@+id/button_range"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="12dp"
+            android:src="@drawable/out_range"
             android:tint="@color/colorPrimaryDark" />
 
     </LinearLayout>

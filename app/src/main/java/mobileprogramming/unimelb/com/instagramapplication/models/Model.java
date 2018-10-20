@@ -14,6 +14,16 @@ public class Model {
     private String video;
     private String postid;
     private String uuid;
+    private boolean range;
+    public boolean isRange() {
+        return range;
+    }
+
+    public void setRange(boolean range) {
+        this.range = range;
+    }
+
+
 
     public String getDate() {
         return date;
