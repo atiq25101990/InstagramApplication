@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -119,6 +120,9 @@ public class FeedLikesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                     } else {
                         imageTypeViewHolder.btn_follow.setText("Following");
                     }
+
+                    if(object.getUuid().equals(FirebaseAuth.getInstance().getCurrentUser().getUid()))
+                        imageTypeViewHolder.btn_follow.setVisibility(View.GONE);
                     imageTypeViewHolder.btn_follow.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {

@@ -243,11 +243,13 @@ public class DiscoverFragment extends Fragment {
                         public void onComplete(@NonNull Task<QuerySnapshot> task) {
 
                             if (task.isSuccessful()) {
-                                WriteBatch batch = query.getFirestore().batch();
-                                for (QueryDocumentSnapshot document : task.getResult()) {
-                                    batch.delete(document.getReference());
-                                }
-                                batch.commit();
+                                String docID = task.getResult().getDocuments().get(0).getId();
+                                db.collection("follower").document(docID).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Log.d(TAG, "onSuccess: follower removed");
+                                    }
+                                });
                             } else {
                                 Log.d(TAG, "Error getting documents.", task.getException());
                             }

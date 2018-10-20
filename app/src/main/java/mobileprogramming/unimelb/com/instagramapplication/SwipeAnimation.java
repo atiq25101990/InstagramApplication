@@ -158,8 +158,21 @@ class SwipeAnimation extends Callback {
                             RecyclerView.ViewHolder viewHolder,
                             float dX, float dY,
                             int actionState, boolean isCurrentlyActive) {
-        // ...
-        drawButtons(c, viewHolder);
+        if (actionState == ACTION_STATE_SWIPE) {
+            if (buttonShowedState != ButtonsState.GONE) {
+                if (buttonShowedState == ButtonsState.LEFT_VISIBLE) dX = Math.max(dX, buttonWidth);
+                if (buttonShowedState == ButtonsState.RIGHT_VISIBLE) dX = Math.min(dX, -buttonWidth);
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+            }
+            else {
+                setTouchListener(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+            }
+        }
+
+        if (buttonShowedState == ButtonsState.GONE) {
+            super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+        }
+        currentItemViewHolder = viewHolder;
     }
     private void drawButtons(Canvas c, RecyclerView.ViewHolder viewHolder) {
         float buttonWidthWithoutPadding = buttonWidth - 20;
@@ -169,14 +182,14 @@ class SwipeAnimation extends Callback {
         Paint p = new Paint();
 
         RectF leftButton = new RectF(itemView.getLeft(), itemView.getTop(), itemView.getLeft() + buttonWidthWithoutPadding, itemView.getBottom());
-        p.setColor(Color.BLUE);
+        p.setColor(Color.GRAY);
         c.drawRoundRect(leftButton, corners, corners, p);
-        drawText("EDIT", c, leftButton, p);
+        drawText("SWIPE", c, leftButton, p);
 
         RectF rightButton = new RectF(itemView.getRight() - buttonWidthWithoutPadding, itemView.getTop(), itemView.getRight(), itemView.getBottom());
-        p.setColor(Color.RED);
+        p.setColor(Color.GRAY);
         c.drawRoundRect(rightButton, corners, corners, p);
-        drawText("DELETE", c, rightButton, p);
+        drawText("SWIPE", c, rightButton, p);
 
         buttonInstance = null;
         if (buttonShowedState == ButtonsState.LEFT_VISIBLE) {
