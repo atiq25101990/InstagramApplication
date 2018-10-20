@@ -2,6 +2,7 @@ package mobileprogramming.unimelb.com.instagramapplication;
 
 import android.content.BroadcastReceiver;
 import android.content.IntentFilter;
+import android.graphics.Canvas;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -10,6 +11,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -47,6 +49,7 @@ public class FriendsNearby extends AppCompatActivity {
     private ArrayList<String> devices = new ArrayList<>();
     private BluetoothDeviceAdapter bluetoothDeviceAdapter;
     BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+    private RecyclerView bluetoothDevList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +84,7 @@ public class FriendsNearby extends AppCompatActivity {
                     Toast.makeText(FriendsNearby.this, "Bluetooth not supported!", Toast.LENGTH_SHORT).show();
                 }
 
+
                 final BluetoothManager bluetoothManager =
                         (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
                 mBluetoothAdapter = bluetoothManager.getAdapter();
@@ -107,7 +111,7 @@ public class FriendsNearby extends AppCompatActivity {
 
                 //bluetoothDevices
 
-                RecyclerView bluetoothDevList = (RecyclerView) findViewById(R.id.bluetoothDevices);
+                bluetoothDevList = (RecyclerView) findViewById(R.id.bluetoothDevices);
                 bluetoothDevList.setHasFixedSize(true);
                 LinearLayoutManager linearLayoutManager = new LinearLayoutManager(FriendsNearby.this, OrientationHelper.VERTICAL, false);
                 bluetoothDevList.setLayoutManager(linearLayoutManager);
@@ -116,6 +120,28 @@ public class FriendsNearby extends AppCompatActivity {
                 //devices.add("Test2");
                 bluetoothDeviceAdapter = new BluetoothDeviceAdapter(FriendsNearby.this, devices);
                 bluetoothDevList.setAdapter(bluetoothDeviceAdapter);
+
+                final SwipeAnimation swipeController = new SwipeAnimation(new SwipeAnimationCallbacks() {
+                    @Override
+                    public void onRightClicked(int position) {
+                        devices.remove(position);
+                        bluetoothDeviceAdapter.notifyItemRemoved(position);
+                        bluetoothDeviceAdapter.notifyItemRangeChanged(position, bluetoothDeviceAdapter.getItemCount());
+                    }
+                });
+
+
+                ItemTouchHelper itemTouchhelper = new ItemTouchHelper(swipeController);
+                itemTouchhelper.attachToRecyclerView(bluetoothDevList);
+
+                bluetoothDevList.addItemDecoration(new RecyclerView.ItemDecoration() {
+                    @Override
+                    public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
+                        swipeController.onDraw(c);
+                    }
+                });
+
+
 
 
 
