@@ -84,5 +84,8 @@
     <!-- Photo types -->
     <string name="new_photo">new_photo</string>
     <string name="user_photo">user_photo</string>
+    <string name="title_activity_nearby_friends">NearbyFriends</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_friends_nearby">FriendsNearby</string>
 
 </resources>
