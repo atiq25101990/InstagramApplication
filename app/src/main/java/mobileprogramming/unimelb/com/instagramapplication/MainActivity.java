@@ -20,8 +20,6 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -30,7 +28,6 @@ import java.net.NetworkInterface;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import mobileprogramming.unimelb.com.instagramapplication.ActivityFeed.ActivityFeed;
 import mobileprogramming.unimelb.com.instagramapplication.Share.PhotoFragment;
@@ -71,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
         mFirestore = FirebaseFirestore.getInstance();
         mainToolbar = findViewById(R.id.main_toolbar);
         setSupportActionBar(mainToolbar);
-        MAC = getMacAddr();
+        MAC = getMAC();
 
         getSupportActionBar().setTitle("Instagram");
         // checking gi t ,erge
@@ -142,7 +139,7 @@ public class MainActivity extends AppCompatActivity {
         ImageLoader.getInstance().init(universalImageLoader.getConfig());
     }
 
-    public static String getMacAddr() {
+    public static String getMAC() {
         try {
             List<NetworkInterface> all = Collections.list(NetworkInterface.getNetworkInterfaces());
             for (NetworkInterface nif : all) {
@@ -164,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
                 return res1.toString();
             }
         } catch (Exception ex) {
-            Log.d(TAG, "getMacAddr: could not get MAC");
+            Log.d(TAG, "getMAC: could not get MAC");
         }
         return "02:00:00:00:00:00";
     }
