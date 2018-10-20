@@ -51,9 +51,12 @@ public class GalleryFragment extends Fragment {
     private ArrayList<String> directories;
     private String mAppend = "file:/";
     private String mSelectedImage;
+    private String type;
 
-    public GalleryFragment() {
-        // Required empty public constructor
+
+    public GalleryFragment(){
+        Bundle bundle = getArguments();
+        type = bundle.getString("type");
     }
 
 
@@ -87,6 +90,7 @@ public class GalleryFragment extends Fragment {
 
                 Intent intent = new Intent(getActivity(), PhotoEditingActivity.class);
                 intent.putExtra(getString(R.string.selected_image), mSelectedImage);
+                intent.putExtra("type", type);
                 startActivity(intent);
             }
         });

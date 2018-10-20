@@ -135,6 +135,7 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.nav_photo:
                         //setFragment(photoFragment);
                         Intent shareActivityIntent = new Intent(MainActivity.this, ShareActivity.class);
+                        shareActivityIntent.putExtra("type", "post");
                         startActivity(shareActivityIntent);
                         return true;
 

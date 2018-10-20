@@ -41,11 +41,15 @@ public class PhotoEditingActivity extends AppCompatActivity {
     private ImageButton bwButton;
     private ImageButton vignetteButton;
     private Button nextButton;
+    private String type;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photo_editing);
+
+        Intent intent = getIntent();
+        type = intent.getStringExtra("type");
 
         setImage();
     }
@@ -72,6 +76,7 @@ public class PhotoEditingActivity extends AppCompatActivity {
                         saveBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
                         byte[] byteArray = stream.toByteArray();
                         intent.putExtra(getString(R.string.selected_bitmap), byteArray);
+                        intent.putExtra("type", type);
                         startActivity(intent);
                     }
 

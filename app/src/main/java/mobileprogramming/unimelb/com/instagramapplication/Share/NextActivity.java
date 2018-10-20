@@ -17,7 +17,6 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -64,12 +63,15 @@ public class NextActivity extends AppCompatActivity {
 
     //currentLocation variables
     private FusedLocationProviderClient mFusedLocationClient;
+    private String type;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_next);
 
+        Intent thisIntent = getIntent();
+        type = thisIntent.getStringExtra("type");
 
         if(checkPermissionsArray(Permissions.PERMISSIONS)){
                 mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
@@ -129,11 +131,11 @@ public class NextActivity extends AppCompatActivity {
 
                 if(intent.hasExtra(getString(R.string.selected_image))){
                     imgUrl = intent.getStringExtra(getString(R.string.selected_image));
-                    mFirebaseMethods.uploadNewPhoto(getString(R.string.new_photo), caption, imageCount, imgUrl, null, currentLocation.toString());
+                    mFirebaseMethods.uploadNewPhoto(getString(R.string.new_photo), caption, imageCount, imgUrl, null, currentLocation.toString(), type);
                 }else if(intent.hasExtra(getString(R.string.selected_bitmap))){
                     byte[] byteArray = intent.getByteArrayExtra(getString(R.string.selected_bitmap));
                     bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
-                    mFirebaseMethods.uploadNewPhoto(getString(R.string.new_photo), caption, imageCount, null, bitmap, currentLocation.toString());
+                    mFirebaseMethods.uploadNewPhoto(getString(R.string.new_photo), caption, imageCount, null, bitmap, currentLocation.toString(), type);
                 }
 
             }

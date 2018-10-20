@@ -3,10 +3,10 @@ package mobileprogramming.unimelb.com.instagramapplication.Share;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -51,8 +51,20 @@ public class ShareActivity extends AppCompatActivity {
     //Setup viewpager for managing the tabs
     private void setupViewPager(){
         SectionsPagerAdapter adapter = new SectionsPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new GalleryFragment());
-        adapter.addFragment(new PhotoFragment());
+
+        String type = getIntent().getStringExtra("type");
+
+        Bundle bundle = new Bundle();
+        bundle.putString("type", type);
+
+        Fragment galleryFragment = new GalleryFragment();
+        galleryFragment.setArguments(bundle);
+
+        Fragment photoFragment = new PhotoFragment();
+        photoFragment.setArguments(bundle);
+
+        adapter.addFragment(galleryFragment);
+        adapter.addFragment(photoFragment);
         mViewPager = findViewById(R.id.container);
         mViewPager.setAdapter(adapter);
 

@@ -18,7 +18,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
@@ -26,14 +25,15 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.UUID;
 
 import mobileprogramming.unimelb.com.instagramapplication.MainActivity;
 import mobileprogramming.unimelb.com.instagramapplication.R;
+import mobileprogramming.unimelb.com.instagramapplication.models.InRangePhoto;
 import mobileprogramming.unimelb.com.instagramapplication.models.Model;
 import mobileprogramming.unimelb.com.instagramapplication.models.Photo;
 
@@ -68,8 +68,8 @@ public class FirebaseMethods {
         }
     }
 
-    public void uploadNewPhoto(String photoType,final String caption,final int count, final String imgUrl, Bitmap bm,
-                               final  String location){
+    public void uploadNewPhoto(String photoType, final String caption, final int count, final String imgUrl, Bitmap bm,
+                               final String location, final String type){
 
         Log.d(TAG, "uploadNewPhoto: attempting to upload new photo.");
 
@@ -102,7 +102,14 @@ public class FirebaseMethods {
                             photoLocation = location;
                             Log.d(TAG, "onSuccess: Photo uploaded successfully");
                             //add the new photo to 'photos' node and 'user_photos' node
-                            addPhotoToDatabase(caption, firebaseUrl.toString());
+                            switch (type){
+                                case "post":
+                                    addPhotoToDatabase(caption, firebaseUrl.toString());
+                                    break;
+                                case "inrange":
+                                    ArrayList<String> inrangeUsers = new ArrayList<>();
+                                    addInRangeToDatabase(caption, firebaseUrl, inrangeUsers);
+                            }
                         }
                     });
                     CommonUtils.dismissProgressDialog();
@@ -134,6 +141,34 @@ public class FirebaseMethods {
         }
         //case2: new profile photo (if I get time)
 
+    }
+
+    private void addInRangeToDatabase(String caption, String url, ArrayList<String> inrangeUsers) {
+        Log.d(TAG,"addPhotoToDatabase: adding photo to database");
+
+        String user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        String username = getUsername(user_id);
+
+        // Setup up the inrange model to be written
+        String newPhotoKey = myRef.child(mContext.getString(R.string.dbname_photos)).push().getKey();
+        InRangePhoto inRangePhoto = new InRangePhoto();
+        inRangePhoto.setDate(getTimestamp());
+        inRangePhoto.setDone_by_id(user_id);
+        inRangePhoto.setImage(newPhotoKey);
+        inRangePhoto.setUsername(username);
+
+        // For each user in range, make an entry in the db
+        for (String user: inrangeUsers){
+            inRangePhoto.setDone_for_id(user);
+            mFirestore.collection("friendnearby")
+                    .document((UUID.fromString(user + String.valueOf(Math.random())).toString()))
+                    .set(inRangePhoto).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    Log.d(TAG, "onComplete: Insertion Successful.");
+                }
+            });
+        }
     }
 
     private String getTimestamp(){

@@ -6,7 +6,6 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.CircularProgressDrawable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +22,8 @@ import mobileprogramming.unimelb.com.instagramapplication.utils.Permissions;
  */
 public class PhotoFragment extends Fragment{
 
+    private final String type;
+
     public static String getTAG() {
         return TAG;
     }
@@ -35,11 +36,14 @@ public class PhotoFragment extends Fragment{
 
     public PhotoFragment() {
         // Required empty public constructor
+
+        Bundle bundle = getArguments();
+        type = bundle.getString("type");
     }
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_photo, container, false);
@@ -59,6 +63,7 @@ public class PhotoFragment extends Fragment{
                     }else{
                         Intent intent = new Intent(getActivity(), ShareActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        intent.putExtra("type", type);
                         startActivity(intent);
                     }
                 }
