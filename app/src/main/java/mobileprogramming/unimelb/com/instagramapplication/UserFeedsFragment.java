@@ -104,6 +104,8 @@ public class UserFeedsFragment extends Fragment {
 
         friendsInRange.clear();
         getMyFriendsInRange();
+        feeds.clear();
+        getFeedsInRange(0);
 
 
         userDetails = SessionManagers.getInstance().getUserDetails();
@@ -227,7 +229,7 @@ public class UserFeedsFragment extends Fragment {
 
     private void getMyFriendsInRange()
     {
-        CollectionReference inRangeFriends = db.collection("freindsnearby");
+        CollectionReference inRangeFriends = db.collection("friendnearby");
         Query query = inRangeFriends.whereEqualTo("done_for_id", uuid).limit(100);
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
@@ -282,7 +284,7 @@ public class UserFeedsFragment extends Fragment {
                             usersFollowings.add(m);
                     }
                     Log.d(TAG, "onComplete: Following users are: " + usersFollowings.size());
-                    getFeedsInRange(0);
+                    //getFeedsInRange(0);
                     getFeeds(0);
 
 
@@ -368,7 +370,7 @@ public class UserFeedsFragment extends Fragment {
         //default id 0
         Log.d("selected", "=>" + id);
         Log.d("Range Size: ","Size: "+friendsInRange.size());
-        CollectionReference inRangeFriends = db.collection("freindsnearby");
+        CollectionReference inRangeFriends = db.collection("friendnearby");
         Query query = inRangeFriends.whereEqualTo("done_for_id", uuid).limit(100);
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
