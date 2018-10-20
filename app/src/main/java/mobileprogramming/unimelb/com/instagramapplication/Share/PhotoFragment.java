@@ -34,11 +34,18 @@ public class PhotoFragment extends Fragment{
     private static final int GALLERY_FRAGMENT_NUM = 2;
     private static final int CAMERA_REQUEST_CODE = 5;
 
+    private String[] inRange;
+
     public PhotoFragment() {
         // Required empty public constructor
 
         Bundle bundle = getArguments();
         type = bundle.getString("type");
+
+        assert type != null;
+        if(type.equals("inrange")){
+            inRange = bundle.getStringArray("users");
+        }
     }
 
 
@@ -64,6 +71,9 @@ public class PhotoFragment extends Fragment{
                         Intent intent = new Intent(getActivity(), ShareActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         intent.putExtra("type", type);
+                        if(type.equals("inrange")){
+                            intent.putExtra("users", inRange);
+                        }
                         startActivity(intent);
                     }
                 }

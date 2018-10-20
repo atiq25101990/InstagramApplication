@@ -9,21 +9,28 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
+import java.net.NetworkInterface;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import mobileprogramming.unimelb.com.instagramapplication.ActivityFeed.ActivityFeed;
 import mobileprogramming.unimelb.com.instagramapplication.Share.PhotoFragment;
@@ -44,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
     private ProfileFragment profileFragment;
     private FirebaseFirestore mFirestore;
     private String user_id;
+    private static final String TAG = "MainActivity";
+    private String MAC;
 
 
     @Override
@@ -62,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
         mFirestore = FirebaseFirestore.getInstance();
         mainToolbar = findViewById(R.id.main_toolbar);
         setSupportActionBar(mainToolbar);
+        MAC = getMacAddr();
 
         getSupportActionBar().setTitle("Instagram");
         // checking gi t ,erge
@@ -71,7 +81,6 @@ public class MainActivity extends AppCompatActivity {
 
         userFeedsFragment = UserFeedsFragment.newInstance();
         discoverFragment = new DiscoverFragment();
-        photoFragment = new PhotoFragment();
         profileFragment = ProfileFragment.newInstance();
 
         if (!SessionManagers.getInstance().IsLogin()) {
@@ -108,13 +117,56 @@ public class MainActivity extends AppCompatActivity {
         }
 
         CommonUtils.dismissProgressDialog();
+        updateMac();
         initImageLoader();
+    }
+
+    private void updateMac() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        HashMap<String, String> macHash = new HashMap<>();
+        macHash.put("MAC", MAC);
+        db.collection("Users")
+                .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .update("MAC", MAC)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "onSuccess: UpdatedMAC");
+                    }
+                });
     }
 
 
     private void initImageLoader() {
         UniversalImageLoader universalImageLoader = new UniversalImageLoader(this);
         ImageLoader.getInstance().init(universalImageLoader.getConfig());
+    }
+
+    public static String getMacAddr() {
+        try {
+            List<NetworkInterface> all = Collections.list(NetworkInterface.getNetworkInterfaces());
+            for (NetworkInterface nif : all) {
+                if (!nif.getName().equalsIgnoreCase("wlan0")) continue;
+
+                byte[] macBytes = nif.getHardwareAddress();
+                if (macBytes == null) {
+                    return "";
+                }
+
+                StringBuilder res1 = new StringBuilder();
+                for (byte b : macBytes) {
+                    res1.append(String.format("%02X:",b));
+                }
+
+                if (res1.length() > 0) {
+                    res1.deleteCharAt(res1.length() - 1);
+                }
+                return res1.toString();
+            }
+        } catch (Exception ex) {
+            Log.d(TAG, "getMacAddr: could not get MAC");
+        }
+        return "02:00:00:00:00:00";
     }
 
     private void selectFragment() {

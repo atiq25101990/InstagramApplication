@@ -64,6 +64,7 @@ public class NextActivity extends AppCompatActivity {
     //currentLocation variables
     private FusedLocationProviderClient mFusedLocationClient;
     private String type;
+    private String[] inRange;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -72,6 +73,11 @@ public class NextActivity extends AppCompatActivity {
 
         Intent thisIntent = getIntent();
         type = thisIntent.getStringExtra("type");
+
+        assert type != null;
+        if(type.equals("inrange")){
+            inRange = intent.getStringArrayExtra("users");
+        }
 
         if(checkPermissionsArray(Permissions.PERMISSIONS)){
                 mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
@@ -131,11 +137,11 @@ public class NextActivity extends AppCompatActivity {
 
                 if(intent.hasExtra(getString(R.string.selected_image))){
                     imgUrl = intent.getStringExtra(getString(R.string.selected_image));
-                    mFirebaseMethods.uploadNewPhoto(getString(R.string.new_photo), caption, imageCount, imgUrl, null, currentLocation.toString(), type);
+                    mFirebaseMethods.uploadNewPhoto(getString(R.string.new_photo), caption, imageCount, imgUrl, null, currentLocation.toString(), type, inRange);
                 }else if(intent.hasExtra(getString(R.string.selected_bitmap))){
                     byte[] byteArray = intent.getByteArrayExtra(getString(R.string.selected_bitmap));
                     bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
-                    mFirebaseMethods.uploadNewPhoto(getString(R.string.new_photo), caption, imageCount, null, bitmap, currentLocation.toString(), type);
+                    mFirebaseMethods.uploadNewPhoto(getString(R.string.new_photo), caption, imageCount, null, bitmap, currentLocation.toString(), type, inRange);
                 }
 
             }

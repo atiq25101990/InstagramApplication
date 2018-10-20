@@ -69,7 +69,7 @@ public class FirebaseMethods {
     }
 
     public void uploadNewPhoto(String photoType, final String caption, final int count, final String imgUrl, Bitmap bm,
-                               final String location, final String type){
+                               final String location, final String type, final String[] inRange){
 
         Log.d(TAG, "uploadNewPhoto: attempting to upload new photo.");
 
@@ -108,7 +108,7 @@ public class FirebaseMethods {
                                     break;
                                 case "inrange":
                                     ArrayList<String> inrangeUsers = new ArrayList<>();
-                                    addInRangeToDatabase(caption, firebaseUrl, inrangeUsers);
+                                    addInRangeToDatabase(caption, firebaseUrl, inRange);
                             }
                         }
                     });
@@ -143,7 +143,7 @@ public class FirebaseMethods {
 
     }
 
-    private void addInRangeToDatabase(String caption, String url, ArrayList<String> inrangeUsers) {
+    private void addInRangeToDatabase(String caption, String url, String[] inrangeUsers) {
         Log.d(TAG,"addPhotoToDatabase: adding photo to database");
 
         String user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();

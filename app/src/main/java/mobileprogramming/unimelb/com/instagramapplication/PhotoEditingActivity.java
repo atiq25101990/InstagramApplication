@@ -42,6 +42,7 @@ public class PhotoEditingActivity extends AppCompatActivity {
     private ImageButton vignetteButton;
     private Button nextButton;
     private String type;
+    private String[] inRange;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +52,10 @@ public class PhotoEditingActivity extends AppCompatActivity {
         Intent intent = getIntent();
         type = intent.getStringExtra("type");
 
+        assert type != null;
+        if(type.equals("inrange")){
+            inRange = intent.getStringArrayExtra("users");
+        }
         setImage();
     }
 
@@ -77,6 +82,9 @@ public class PhotoEditingActivity extends AppCompatActivity {
                         byte[] byteArray = stream.toByteArray();
                         intent.putExtra(getString(R.string.selected_bitmap), byteArray);
                         intent.putExtra("type", type);
+                        if(type.equals("inrange")){
+                            intent.putExtra("users", inRange);
+                        }
                         startActivity(intent);
                     }
 

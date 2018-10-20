@@ -52,11 +52,17 @@ public class GalleryFragment extends Fragment {
     private String mAppend = "file:/";
     private String mSelectedImage;
     private String type;
+    private String[] inRange;
 
 
     public GalleryFragment(){
         Bundle bundle = getArguments();
         type = bundle.getString("type");
+
+        assert type != null;
+        if(type.equals("inrange")){
+            inRange = bundle.getStringArray("users");
+        }
     }
 
 
@@ -91,6 +97,9 @@ public class GalleryFragment extends Fragment {
                 Intent intent = new Intent(getActivity(), PhotoEditingActivity.class);
                 intent.putExtra(getString(R.string.selected_image), mSelectedImage);
                 intent.putExtra("type", type);
+                if(type.equals("inrange")){
+                    intent.putExtra("users", inRange);
+                }
                 startActivity(intent);
             }
         });
