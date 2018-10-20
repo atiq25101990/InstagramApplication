@@ -1,10 +1,16 @@
 package mobileprogramming.unimelb.com.instagramapplication;
 
+import android.content.BroadcastReceiver;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.OrientationHelper;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.bluetooth.BluetoothAdapter;
@@ -25,14 +31,29 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
+import butterknife.BindView;
+import mobileprogramming.unimelb.com.instagramapplication.adapter.BluetoothDeviceAdapter;
+import mobileprogramming.unimelb.com.instagramapplication.adapter.UsersAdapter;
+import mobileprogramming.unimelb.com.instagramapplication.listener.OnLoadMoreListener;
+import mobileprogramming.unimelb.com.instagramapplication.listener.RecyclerViewLoadMoreScroll;
+import mobileprogramming.unimelb.com.instagramapplication.models.ModelUsers;
+
 public class FriendsNearby extends AppCompatActivity {
 
     private static final int REQUEST_ENABLE_BT = 1;
     private static final long SCAN_PERIOD = 10000;
+    private ArrayList<String> devices = new ArrayList<>();
+    private BluetoothDeviceAdapter bluetoothDeviceAdapter;
+    BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
+
         setContentView(R.layout.activity_friends_nearby);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -54,21 +75,28 @@ public class FriendsNearby extends AppCompatActivity {
 
                 // Initializes a Bluetooth adapter.  For API level 18 and above, get a reference to
                 // BluetoothAdapter through BluetoothManager.
-                BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
                 if (mBluetoothAdapter == null) {
                     // Device doesn't support Bluetooth
+                    Toast.makeText(FriendsNearby.this, "Bluetooth not supported!", Toast.LENGTH_SHORT).show();
                 }
 
                 final BluetoothManager bluetoothManager =
                         (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
                 mBluetoothAdapter = bluetoothManager.getAdapter();
+                mBluetoothAdapter.startDiscovery();
+
+                IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+                registerReceiver(mReceiver, filter);
 
                 // Checks if Bluetooth is supported on the device.
+                /*
                 if (mBluetoothAdapter == null) {
                     Toast.makeText(FriendsNearby.this, "Bluetooth not supported!", Toast.LENGTH_SHORT).show();
                     finish();
                     return;
                 }
+                */
 
                 /**Else list people in recycler view such that when they are selected.
                  * an entry is pushed to server with their uuid and timestamp.
@@ -77,23 +105,37 @@ public class FriendsNearby extends AppCompatActivity {
                  * 15 minutes, show friend in range.
                  */
 
-                /*
-                BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-                if (mBluetoothAdapter == null) {
-                    // Device doesn't support Bluetooth
-                }
-                else
-                {
-                    if (!mBluetoothAdapter.isEnabled()) {
-                        Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                        startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-                    }
-                }
-                */
+                //bluetoothDevices
+
+                RecyclerView bluetoothDevList = (RecyclerView) findViewById(R.id.bluetoothDevices);
+                bluetoothDevList.setHasFixedSize(true);
+                LinearLayoutManager linearLayoutManager = new LinearLayoutManager(FriendsNearby.this, OrientationHelper.VERTICAL, false);
+                bluetoothDevList.setLayoutManager(linearLayoutManager);
+                //bluetoothDevList.add("");
+                //devices.add("Test1");
+                //devices.add("Test2");
+                bluetoothDeviceAdapter = new BluetoothDeviceAdapter(FriendsNearby.this, devices);
+                bluetoothDevList.setAdapter(bluetoothDeviceAdapter);
+
 
 
             }
         });
     }
+
+    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+                BluetoothDevice device = intent
+                        .getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                devices.add(device.getName() + "\n" + device.getAddress());
+                Log.d("BT1", device.getName() + "\n" + device.getAddress());
+                //listView.setAdapter(new ArrayAdapter<String>(context,
+                        //android.R.layout.simple_list_item_1, mDeviceList));
+                bluetoothDeviceAdapter.notifyDataSetChanged();
+            }
+        }
+    };
 
 }
