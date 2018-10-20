@@ -81,7 +81,6 @@ public class FirebaseMethods {
             byte[] bytes = ImageManager.getBytesFromBitmap(bm, 100);
 
             String user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
-            Toast.makeText(mContext, "uploadNewPhoto: Count " +count, Toast.LENGTH_LONG).show();
             StorageReference storageReference = mStorageReference
                     .child(filePaths.FIREBASE_IMAGE_STORAGE + "/" + user_id + "/" + UUID.nameUUIDFromBytes(bytes));
 
@@ -101,14 +100,14 @@ public class FirebaseMethods {
                         public void onSuccess(Uri uri) {
                             String firebaseUrl = uri.toString();
                             photoLocation = location;
-
+                            Log.d(TAG, "onSuccess: Photo uploaded successfully");
                             //add the new photo to 'photos' node and 'user_photos' node
                             addPhotoToDatabase(caption, firebaseUrl.toString());
                         }
                     });
-                    Toast.makeText(mContext, "Photo upload success", Toast.LENGTH_LONG).show();
-
+                    CommonUtils.dismissProgressDialog();
                     //navigate to the main feed so the user can see the photo
+
                     Intent intent = new Intent(mContext, MainActivity.class);
                     mContext.startActivity(intent);
                 }
@@ -117,7 +116,6 @@ public class FirebaseMethods {
                 public void onFailure(@NonNull Exception e) {
 
                     Log.d(TAG, "onFailure: Photo upload failed.");
-                    Toast.makeText(mContext, "Photo upload failed", Toast.LENGTH_LONG).show();
 
                 }
             }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
@@ -126,7 +124,7 @@ public class FirebaseMethods {
                     double progress = (100 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
 
                     if (progress - 15 > mPhotoUploadProgress) {
-                        Toast.makeText(mContext, "photo upload progress: " + String.format("%.0f", progress) + "%", Toast.LENGTH_LONG).show();
+                        Toast.makeText(mContext, "photo upload progress: " + String.format("%.0f", progress) + "%", Toast.LENGTH_SHORT).show();
                         mPhotoUploadProgress = progress;
                     }
 
@@ -147,8 +145,6 @@ public class FirebaseMethods {
     private void addPhotoToDatabase(String caption, String url){
         Log.d(TAG,"addPhotoToDatabase: adding photo to database");
 
-        Toast.makeText(mContext, "Reached addPhotoToDatabase before insertion", Toast.LENGTH_LONG).show();
-
         String user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
         String username = getUsername(user_id);
 
@@ -164,9 +160,6 @@ public class FirebaseMethods {
         photo.setPhoto_id(newPhotoKey);
         photo.setLocation(photoLocation);
 
-        Toast.makeText(mContext, "Photo object: "+ photo, Toast.LENGTH_LONG).show();
-
-
         //myRef.child(mContext.getString(R.string.dbname_user_photos)).child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child(newPhotoKey).setValue(photo);
         //myRef.child(mContext.getString(R.string.dbname_photos)).child(newPhotoKey).setValue(photo);
 
@@ -174,7 +167,7 @@ public class FirebaseMethods {
         mFirestore.collection("post").document(newPhotoKey).set(photo).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
-                Toast.makeText(mContext, "Insertion successful", Toast.LENGTH_LONG).show();
+                Log.d(TAG, "onComplete: Insertion Successful.");
             }
         });
 

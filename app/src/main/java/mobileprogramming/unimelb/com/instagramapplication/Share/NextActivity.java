@@ -32,6 +32,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import mobileprogramming.unimelb.com.instagramapplication.R;
+import mobileprogramming.unimelb.com.instagramapplication.utils.CommonUtils;
 import mobileprogramming.unimelb.com.instagramapplication.utils.FirebaseMethods;
 import mobileprogramming.unimelb.com.instagramapplication.utils.Permissions;
 import mobileprogramming.unimelb.com.instagramapplication.utils.UniversalImageLoader;
@@ -122,8 +123,8 @@ public class NextActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Log.d(TAG,"onClick: navigating to the final share screen");
+                CommonUtils.showLoadingDialog(NextActivity.this);
                 //upload the image to firebase
-                Toast.makeText(NextActivity.this,"Attempting to upload new photo", Toast.LENGTH_LONG).show();
                 String caption = mCaption.getText().toString();
 
                 if(intent.hasExtra(getString(R.string.selected_image))){

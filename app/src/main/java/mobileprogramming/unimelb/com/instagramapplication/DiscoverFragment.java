@@ -269,7 +269,7 @@ public class DiscoverFragment extends Fragment {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 feedsSearchResult.clear();
                 for (int i = 0; i < feeds.size(); i++) {
-                    if (feeds.get(i).getUsername().contains(s.toString())) {
+                    if (feeds.get(i).getUsername().toLowerCase().contains(s.toString().toLowerCase())) {
                         feedsSearchResult.add(feeds.get(i));
                     }
                 }

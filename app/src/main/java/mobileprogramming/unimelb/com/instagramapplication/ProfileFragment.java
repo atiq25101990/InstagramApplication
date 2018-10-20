@@ -1,6 +1,7 @@
 package mobileprogramming.unimelb.com.instagramapplication;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -12,9 +13,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
@@ -26,6 +29,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -117,6 +121,9 @@ public class ProfileFragment extends Fragment {
                 textViewEditProfile.setText("Follow");
             }
         }
+
+
+
         Log.d(TAG, "onViewCreated: The username is " + uuid);
 
         getFollowingCount();
@@ -142,6 +149,112 @@ public class ProfileFragment extends Fragment {
                         profileDisplayName.setText(profileUser.get("name"));
                         Glide.with(getContext()).load(document.getString("image")).into(profileCircularPicture);
 
+                        textViewEditProfile.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                String text = String.valueOf(textViewEditProfile.getText());
+
+                                switch (text){
+                                    case "Follow":
+                                        textViewEditProfile.setText("UnFollow");
+                                        HashMap<String, String> followObject = new HashMap<>();
+                                        HashMap<String, String> activityObject = new HashMap<>();
+
+                                        String done_by_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                                        String done_by_name = SessionManagers.getInstance().getUserDetails().get(Constant.KEY_UNAME);
+                                        String done_for_id = uuid;
+                                        String done_for_name = profileUser.get("username");
+                                        String type = "Follow";
+                                        String date = String.valueOf(Calendar.getInstance().getTime());
+
+                                        followObject.put("uid", uuid);
+                                        followObject.put("followerid", done_by_id);
+                                        followObject.put("date", date);
+
+                                        activityObject.put("done_by_name", done_by_name);
+                                        activityObject.put("done_by_id", done_by_id);
+                                        activityObject.put("done)for_id", done_for_id);
+                                        activityObject.put("done_for_name", done_for_name);
+                                        activityObject.put("date", date);
+                                        activityObject.put("type", type);
+
+
+                                        db.collection("follower").add(followObject).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<DocumentReference> task) {
+                                                if(task.isSuccessful()){
+                                                    Log.d(TAG, "onComplete: followersWritten");
+                                                } else {
+                                                    Toast.makeText(getContext(), "Unable to follow.", Toast.LENGTH_LONG).show();
+                                                    textViewEditProfile.setText("Follow");
+                                                }
+                                            }
+                                        });
+
+                                        db.collection("activity").add(activityObject).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                            @Override
+                                            public void onSuccess(DocumentReference documentReference) {
+                                                Log.d(TAG, "onSuccess: activity written");
+                                            }
+                                        });
+                                        break;
+                                    case "Unfollow":
+
+                                        textViewEditProfile.setText("Follow");
+                                        Query followQuery = db.collection("follower")
+                                                .whereEqualTo("uid", uuid)
+                                                .whereEqualTo("followerid", FirebaseAuth.getInstance().getCurrentUser().getUid());
+
+                                        Query activityQuery = db.collection("activity")
+                                                .whereEqualTo("done_by_id", FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                                .whereEqualTo("done_for_id", uuid)
+                                                .whereEqualTo("type", "Follow");
+
+                                        followQuery.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                if(task.isSuccessful()){
+                                                    String doc = task.getResult().getDocuments().get(0).getId();
+                                                    db.collection("follower")
+                                                            .document(doc)
+                                                            .delete()
+                                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                @Override
+                                                                public void onSuccess(Void aVoid) {
+                                                                    Log.d(TAG, "onSuccess: followerDeleted");
+                                                                }
+                                                            });
+                                                } else {
+                                                    Toast.makeText(getContext(), "Could not Unfollow", Toast.LENGTH_LONG).show();
+                                                    textViewEditProfile.setText("Unfollow");
+                                                }
+                                            }
+                                        });
+
+                                        activityQuery.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                if(task.isSuccessful() && !task.getResult().isEmpty()){
+                                                    String doc = task.getResult().getDocuments().get(0).getId();
+                                                    db.collection("activity")
+                                                            .document(doc)
+                                                            .delete()
+                                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                @Override
+                                                                public void onSuccess(Void aVoid) {
+                                                                    Log.d(TAG, "onSuccess: followerDeleted");
+                                                                }
+                                                            });
+                                                }
+                                            }
+                                        });
+                                        break;
+                                    default:
+                                        Intent settingsIntent = new Intent(getContext(), SetupActivity.class);
+                                        startActivity(settingsIntent);
+                                }
+                            }
+                        });
                         getPostedImages();
                     } else {
                         Log.d(TAG, "onComplete: Failed to get document");

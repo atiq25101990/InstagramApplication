@@ -71,9 +71,10 @@
 
     <Button
         android:layout_width="match_parent"
-        android:layout_height="18dp"
+        android:layout_height="64dp"
         android:id="@+id/filterDoneButton"
         android:text="Next"
+        android:background="@drawable/white_grey_top_border"
         android:textAlignment="center"
         android:padding="8dp"/>
 
