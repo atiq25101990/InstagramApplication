@@ -274,14 +274,12 @@ public class UserFeedsFragment extends Fragment {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
+                    usersFollowings.clear();
                     for (QueryDocumentSnapshot document : task.getResult()) {
-                        if (task.isSuccessful()) {
                             final ModelUsersFollowing m = new ModelUsersFollowing();
                             m.setUuid(document.getData().get("uid").toString());
                             m.setFollowerid(document.getData().get("followerid").toString());
                             usersFollowings.add(m);
-
-                        }
                     }
                     Log.d(TAG, "onComplete: Following users are: " + usersFollowings.size());
                     getFeedsInRange(0);

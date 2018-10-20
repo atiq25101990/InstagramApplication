@@ -186,6 +186,7 @@ public class DiscoverFragment extends Fragment {
             }
         });
         mDiscoverRecyclerView.addOnScrollListener(scrollListener);
+
         adapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(final int position, int in) {

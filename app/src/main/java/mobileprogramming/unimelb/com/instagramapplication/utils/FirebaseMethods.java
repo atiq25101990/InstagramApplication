@@ -150,18 +150,17 @@ public class FirebaseMethods {
         String username = SessionManagers.getInstance().getUserDetails().get(Constant.KEY_UNAME);
 
         // Setup up the inrange model to be written
-        String newPhotoKey = myRef.child(mContext.getString(R.string.dbname_photos)).push().getKey();
         InRangePhoto inRangePhoto = new InRangePhoto();
         inRangePhoto.setDate(getTimestamp());
         inRangePhoto.setDone_by_id(user_id);
-        inRangePhoto.setImage(newPhotoKey);
+        inRangePhoto.setImage(url);
         inRangePhoto.setUsername(username);
 
         // For each user in range, make an entry in the db
         for (String user: inrangeUsers){
             inRangePhoto.setDone_for_id(user);
             mFirestore.collection("friendnearby")
-                    .document((UUID.fromString(user + String.valueOf(Math.random())).toString()))
+                    .document(UUID.randomUUID().toString())
                     .set(inRangePhoto).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
