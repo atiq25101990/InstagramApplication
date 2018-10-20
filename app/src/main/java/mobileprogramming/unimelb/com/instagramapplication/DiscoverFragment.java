@@ -103,6 +103,8 @@ public class DiscoverFragment extends Fragment {
         ButterKnife.bind(this, view);
         uuid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
+        CommonUtils.showLoadingDialog(getContext());
+
         recyclerViewSuggestions.setHasFixedSize(true);
         LinearLayoutManager horizontalLayoutManagerSug = new LinearLayoutManager(getContext(), OrientationHelper.HORIZONTAL, false);
         recyclerViewSuggestions.setLayoutManager(horizontalLayoutManagerSug);
@@ -478,7 +480,7 @@ public class DiscoverFragment extends Fragment {
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                //CommonUtils.dismissProgressDialog();
+                CommonUtils.dismissProgressDialog();
                 if (task.isSuccessful()) {
                     int someCount= 0;
                     for (QueryDocumentSnapshot document : task.getResult()) {

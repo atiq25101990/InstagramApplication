@@ -33,6 +33,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import de.hdodenhof.circleimageview.CircleImageView;
 import mobileprogramming.unimelb.com.instagramapplication.adapter.ProfileImageAdapter;
+import mobileprogramming.unimelb.com.instagramapplication.utils.Constant;
+import mobileprogramming.unimelb.com.instagramapplication.utils.SessionManagers;
 
 
 /**

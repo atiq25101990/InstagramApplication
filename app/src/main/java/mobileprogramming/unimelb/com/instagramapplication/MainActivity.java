@@ -2,12 +2,11 @@ package mobileprogramming.unimelb.com.instagramapplication;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -24,10 +23,10 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.util.HashMap;
+import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import mobileprogramming.unimelb.com.instagramapplication.ActivityFeed.ActivityFeed;
+import mobileprogramming.unimelb.com.instagramapplication.Share.PhotoFragment;
 import mobileprogramming.unimelb.com.instagramapplication.Share.ShareActivity;
 import mobileprogramming.unimelb.com.instagramapplication.utils.CommonUtils;
 import mobileprogramming.unimelb.com.instagramapplication.utils.Constant;
@@ -39,14 +38,12 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private BottomNavigationView mMainNav;
     private FrameLayout mMainFrame;
-    private final UserFeedsFragment userFeedsFragment = new UserFeedsFragment();
-    private DiscoverFragment discoverFragment = new DiscoverFragment();
-    private ProfileFragment profileFragment = new ProfileFragment();
+    private UserFeedsFragment userFeedsFragment;
+    private DiscoverFragment discoverFragment;
+    private PhotoFragment photoFragment;
+    private ProfileFragment profileFragment;
     private FirebaseFirestore mFirestore;
     private String user_id;
-    final FragmentManager fm = getSupportFragmentManager();
-    Fragment active = userFeedsFragment;
-
 
 
     @Override
@@ -72,6 +69,11 @@ public class MainActivity extends AppCompatActivity {
         mMainFrame = (FrameLayout) findViewById(R.id.main_frame);
         mMainNav = (BottomNavigationView) findViewById(R.id.main_nav);
 
+        userFeedsFragment = UserFeedsFragment.newInstance();
+        discoverFragment = DiscoverFragment.newInstance();
+        photoFragment = new PhotoFragment();
+        profileFragment = ProfileFragment.newInstance();
+
         if (!SessionManagers.getInstance().IsLogin()) {
             FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
             if (currentUser != null) {
@@ -88,6 +90,8 @@ public class MainActivity extends AppCompatActivity {
                                 userProfile.put(Constant.KEY_NAME, task.getResult().getString("name"));
                                 userProfile.put(Constant.KEY_UNAME, task.getResult().getString("username"));
                                 SessionManagers.getInstance().setUserProfile(userProfile);
+                                setFragment(userFeedsFragment);
+                                selectFragment();
                             }
 
                         } else {
@@ -96,22 +100,10 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
             }
+        } else {
+            setFragment(userFeedsFragment);
+            selectFragment();
         }
-
-
-        Bundle bundle = new Bundle();
-        bundle.putString("uid", FirebaseAuth.getInstance().getCurrentUser().getUid());
-        userFeedsFragment.setArguments(bundle);
-        profileFragment.setArguments(bundle);
-        discoverFragment.setArguments(bundle);
-
-
-        fm.beginTransaction().add(R.id.main_frame, discoverFragment, discoverFragment.getTAG()).hide(discoverFragment).commit();
-        fm.beginTransaction().add(R.id.main_frame, profileFragment, profileFragment.getTAG()).hide(profileFragment).commit();
-        fm.beginTransaction().add(R.id.main_frame, userFeedsFragment, userFeedsFragment.getTAG()).commit();
-
-        setFragment(userFeedsFragment);
-        selectFragment();
 
         CommonUtils.dismissProgressDialog();
         initImageLoader();
@@ -152,16 +144,23 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.nav_profile:
                         setFragment(profileFragment);
                         return true;
+
                     default:
                         return false;
                 }
+
+
             }
         });
     }
 
     private void setFragment(Fragment fragment) {
-        fm.beginTransaction().hide(active).show(fragment).commit();
-        active = fragment;
+        Bundle bundle = new Bundle();
+        bundle.putString("uid", FirebaseAuth.getInstance().getCurrentUser().getUid());
+        fragment.setArguments(bundle);
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.main_frame, fragment).addToBackStack(null);
+        fragmentTransaction.commit();
     }
 
 
@@ -199,25 +198,37 @@ public class MainActivity extends AppCompatActivity {
      */
     @Override
     public void onBackPressed() {
-        if (active instanceof UserFeedsFragment) {
+        Fragment fragment = getVisibleFragment();
+        if (fragment instanceof UserFeedsFragment) {
             finish();
         } else {
-            setFragment(userFeedsFragment);
-            setBottomNavigationView();
+            super.onBackPressed();
         }
     }
 
     public void setBottomNavigationView() {
-
-        if (active != null) {
-            if (active instanceof UserFeedsFragment && mMainNav.getSelectedItemId() != R.id.nav_userfeeds) {
+        Fragment fragment = getVisibleFragment();
+        if (fragment != null) {
+            if (fragment instanceof UserFeedsFragment && mMainNav.getSelectedItemId() != R.id.nav_userfeeds) {
                 mMainNav.setSelectedItemId(R.id.nav_userfeeds);
-            } else if (active instanceof DiscoverFragment && mMainNav.getSelectedItemId() != R.id.nav_discover) {
+            } else if (fragment instanceof DiscoverFragment && mMainNav.getSelectedItemId() != R.id.nav_discover) {
                 mMainNav.setSelectedItemId(R.id.nav_discover);
-            } else if (active instanceof ProfileFragment && mMainNav.getSelectedItemId() != R.id.nav_profile) {
+            } else if (fragment instanceof ProfileFragment && mMainNav.getSelectedItemId() != R.id.nav_profile) {
                 mMainNav.setSelectedItemId(R.id.nav_profile);
             }
         }
+    }
+
+    public Fragment getVisibleFragment() {
+        FragmentManager fragmentManager = MainActivity.this.getSupportFragmentManager();
+        List<Fragment> fragments = fragmentManager.getFragments();
+        if (fragments != null) {
+            for (Fragment fragment : fragments) {
+                if (fragment != null && fragment.isVisible())
+                    return fragment;
+            }
+        }
+        return null;
     }
 
     private void logout() {

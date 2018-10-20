@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import mobileprogramming.unimelb.com.instagramapplication.PhotoEditingActivity;
 import mobileprogramming.unimelb.com.instagramapplication.R;
 import mobileprogramming.unimelb.com.instagramapplication.utils.Permissions;
 
@@ -92,7 +93,7 @@ public class PhotoFragment extends Fragment{
             if(isRootTask()){
                 try{
                     Log.d(TAG, "onActivityResult: received new bitmap from camera: " + bitmap);
-                    Intent intent = new Intent(getActivity(), NextActivity.class);
+                    Intent intent = new Intent(getActivity(), PhotoEditingActivity.class);
                     intent.putExtra(getString(R.string.selected_bitmap), bitmap);
                     startActivity(intent);
                 }catch (NullPointerException e){

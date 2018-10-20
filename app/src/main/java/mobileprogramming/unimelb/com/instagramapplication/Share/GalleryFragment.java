@@ -24,6 +24,7 @@ import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 
 import java.util.ArrayList;
 
+import mobileprogramming.unimelb.com.instagramapplication.PhotoEditingActivity;
 import mobileprogramming.unimelb.com.instagramapplication.R;
 import mobileprogramming.unimelb.com.instagramapplication.utils.FilePaths;
 import mobileprogramming.unimelb.com.instagramapplication.utils.FileSearch;
@@ -84,7 +85,7 @@ public class GalleryFragment extends Fragment {
             public void onClick(View view) {
                 Log.d(TAG,"onClick: navigating to the final share screen");
 
-                Intent intent = new Intent(getActivity(), NextActivity.class);
+                Intent intent = new Intent(getActivity(), PhotoEditingActivity.class);
                 intent.putExtra(getString(R.string.selected_image), mSelectedImage);
                 startActivity(intent);
             }
