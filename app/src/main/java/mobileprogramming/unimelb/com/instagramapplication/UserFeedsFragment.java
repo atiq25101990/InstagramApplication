@@ -66,6 +66,7 @@ public class UserFeedsFragment extends Fragment {
     private FeedAdapter adapter;
     private ArrayList<Model> feeds = new ArrayList<>();
     private ArrayList<ModelUsersFollowing> usersFollowings = new ArrayList<>();
+    private ArrayList<String> friendsInRange = new ArrayList<>();
     private View view;
     private RecyclerViewLoadMoreScroll scrollListener;
     private FragmentManager fm;
@@ -220,6 +221,27 @@ public class UserFeedsFragment extends Fragment {
 
     }
 
+    private void getMyFriendsInRange()
+    {
+        CollectionReference inRangeFriends = db.collection("freindsnearby");
+        Query query = inRangeFriends.whereEqualTo("done_for_id", uuid).limit(100);
+        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        if (task.isSuccessful()) {
+                          //document.getData().get("uid").toString()
+                            friendsInRange.add(document.getData().get("done_by_id").toString());
+                        }
+                    }
+                }
+
+            }
+        });
+
+    }
 
     private void LoadMoreData() {
         adapter.addLoadingView();
@@ -292,6 +314,15 @@ public class UserFeedsFragment extends Fragment {
                             m.setUsername(document.getData().get("username").toString());
                             m.setDate(document.getData().get("date").toString());
                             Log.d(TAG, document.getData().get("date").toString());
+
+                            if(friendsInRange.contains(document.getData().get("uid").toString()))
+                            {
+                                m.setRange(true);
+                            }
+                            else
+                            {
+                                m.setRange(false);
+                            }
 
                             for (int i = 0; i < usersFollowings.size(); i++) {
                                 if (usersFollowings.get(i).getUuid().equals(document.getData().get("uid").toString())) {

@@ -141,8 +141,17 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     imageTypeViewHolder.txt_likes.setText(String.valueOf(object.getLikes()) + " likes");
                     imageTypeViewHolder.txt_username.setText(String.valueOf(object.getUsername()));
                     imageTypeViewHolder.uid = object.getUuid();
-                    SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM dd HH:mm:ss Z yyyy");
 
+                    if(object.isRange())
+                    {
+                        imageTypeViewHolder.btn_range.setImageResource(R.drawable.in_range);
+                    }
+                    else
+                    {
+                        imageTypeViewHolder.btn_range.setImageResource(R.drawable.out_range);
+                    }
+
+                    SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM dd HH:mm:ss Z yyyy");
                     SimpleDateFormat formatterOut = new SimpleDateFormat("HH:mm:ss dd MMM yyyy");
                     try {
                         Date date = formatter.parse(object.getDate());
@@ -275,6 +284,7 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         ImageView txt_comments;
         TextView txt_date;
         ImageView btn_like;
+        ImageView btn_range;
         String uid;
 
 
@@ -287,6 +297,7 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             txt_username = itemView.findViewById(R.id.txt_username);
             btn_like = itemView.findViewById(R.id.btn_like);
             txt_comments = itemView.findViewById(R.id.button_comment);
+            btn_range = itemView.findViewById(R.id.button_range);
         }
 
     }
