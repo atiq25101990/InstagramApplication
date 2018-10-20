@@ -5,6 +5,9 @@
         android:id="@+id/action_settings_btn"
         android:title="@string/action_setting_text" />
     <item
+        android:id="@+id/action_bluetooth_btn"
+        android:title="Nearby Friends" />
+    <item
         android:id="@+id/action_logout_btn"
         android:title="@string/action_logout_text" />
 </menu>

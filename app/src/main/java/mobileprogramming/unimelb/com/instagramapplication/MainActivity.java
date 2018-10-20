@@ -101,6 +101,8 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         } else {
+            //Intent shareActivityIntent = new Intent(MainActivity.this, FriendsNearby.class);
+            //startActivity(shareActivityIntent);
             setFragment(userFeedsFragment);
             selectFragment();
         }
@@ -174,6 +176,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
+        Intent settingsIntent;
+
         switch (item.getItemId()) {
             case R.id.action_logout_btn:
 
@@ -183,8 +187,15 @@ public class MainActivity extends AppCompatActivity {
 
             case R.id.action_settings_btn:
                 //account setting button is clicked
-                Intent settingsIntent = new Intent(MainActivity.this, SetupActivity.class);
+                settingsIntent = new Intent(MainActivity.this, SetupActivity.class);
                 startActivity(settingsIntent);
+                return true;
+
+            case R.id.action_bluetooth_btn:
+                //account setting button is clicked
+                settingsIntent = new Intent(MainActivity.this, FriendsNearby.class);
+                startActivity(settingsIntent);
+                Toast.makeText(MainActivity.this, "Initiating Bluetooth Activity!", Toast.LENGTH_SHORT).show();
                 return true;
 
             default:

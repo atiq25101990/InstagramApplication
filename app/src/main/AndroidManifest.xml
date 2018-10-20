@@ -15,6 +15,11 @@
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
+    <!-- Adding blutooth permissions-->
+      <uses-permission android:name="android.permission.BLUETOOTH" />
+  <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+  <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
     <application
         android:name=".App"
         android:allowBackup="true"
@@ -48,7 +53,11 @@
         <activity android:name=".FeedCommentsActivity" />
         <activity android:name=".ActivityFeed.ActivityFeed" />
         <activity android:name=".PostActivity" />
-        <activity android:name=".PhotoEditingActivity"></activity>
+        <activity android:name=".PhotoEditingActivity" />
+        <activity
+            android:name=".FriendsNearby"
+            android:label="@string/title_activity_friends_nearby"
+            android:theme="@style/AppTheme"></activity>
     </application>
 
 </manifest>
