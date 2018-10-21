@@ -15,6 +15,13 @@ public class Model {
     private String postid;
     private String uuid;
     private boolean range;
+
+    public String getCaption() {
+        return caption;
+    }
+
+    private String caption;
+
     public boolean isRange() {
         return range;
     }
@@ -132,4 +139,7 @@ public class Model {
         this.type = 1;
     }
 
+    public void setCaption(String caption) {
+        this.caption = caption;
+    }
 }

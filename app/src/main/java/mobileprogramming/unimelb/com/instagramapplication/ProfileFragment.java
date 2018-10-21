@@ -67,6 +67,8 @@ public class ProfileFragment extends Fragment {
     TextView profileDisplayName;
     @BindView(R.id.profilePictureGrid)
     GridView profilePictureGrid;
+    @BindView(R.id.profileDescription)
+    TextView profileDescription;
 
     @BindView(R.id.profile_user_name)
     TextView profileUserName;
@@ -144,9 +146,12 @@ public class ProfileFragment extends Fragment {
                     if (document.exists()) {
                         profileUser.put("username", document.getString("username"));
                         profileUser.put("imageURL", document.getString("image"));
+                        profileUser.put("bio", document.getString("bio"));
 
                         profileUserName.setText(profileUser.get("username"));
                         profileDisplayName.setText(profileUser.get("name"));
+                        profileDescription.setText(profileUser.get("bio"));
+
                         Glide.with(getContext()).load(document.getString("image")).into(profileCircularPicture);
 
                         textViewEditProfile.setOnClickListener(new View.OnClickListener() {
@@ -156,7 +161,7 @@ public class ProfileFragment extends Fragment {
 
                                 switch (text){
                                     case "Follow":
-                                        textViewEditProfile.setText("UnFollow");
+                                        textViewEditProfile.setText("Unfollow");
                                         HashMap<String, String> followObject = new HashMap<>();
                                         HashMap<String, String> activityObject = new HashMap<>();
 

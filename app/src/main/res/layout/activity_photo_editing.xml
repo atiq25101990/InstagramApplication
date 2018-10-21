@@ -51,22 +51,22 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:id="@+id/sepiaFilter"
-            android:layout_height="wrap_content"
-            android:src="@drawable/default_profile_picture"/>
+            android:layout_height="64dp"
+            android:src="@drawable/sepia_filter"/>
 
         <ImageButton
             android:layout_width="0dp"
             android:layout_weight="1"
             android:id="@+id/bwFilter"
-            android:layout_height="wrap_content"
-            android:src="@drawable/default_profile_picture"/>
+            android:layout_height="64dp"
+            android:src="@drawable/bw_filter"/>
 
         <ImageButton
             android:layout_width="0dp"
             android:layout_weight="1"
             android:id="@+id/vignetteFilter"
-            android:layout_height="wrap_content"
-            android:src="@drawable/default_profile_picture"/>
+            android:layout_height="64dp"
+            android:src="@drawable/vignette_filter"/>
     </LinearLayout>
 
     <Button
@@ -76,6 +76,6 @@
         android:text="Next"
         android:background="@drawable/white_grey_top_border"
         android:textAlignment="center"
-        android:padding="8dp"/>
+        android:padding="16dp"/>
 
 </LinearLayout>

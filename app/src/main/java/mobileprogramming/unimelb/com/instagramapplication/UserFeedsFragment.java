@@ -329,6 +329,7 @@ public class UserFeedsFragment extends Fragment {
                             m.setImage(document.getData().get("image").toString());
                             m.setUuid(document.getData().get("uid").toString());
                             m.setDate(document.getData().get("date").toString());
+                            m.setCaption(document.getString("caption"));
                             Log.d(TAG, document.getData().get("date").toString());
                             try {
                                 m.setUsername(String.valueOf(document.getData().get("username")));

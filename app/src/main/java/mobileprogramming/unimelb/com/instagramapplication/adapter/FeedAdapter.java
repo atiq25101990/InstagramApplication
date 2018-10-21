@@ -12,7 +12,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -141,14 +140,12 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     imageTypeViewHolder.txt_likes.setText(String.valueOf(object.getLikes()) + " likes");
                     imageTypeViewHolder.txt_username.setText(String.valueOf(object.getUsername()));
                     imageTypeViewHolder.uid = object.getUuid();
+                    imageTypeViewHolder.txtCaption.setText(object.getCaption());
 
-                    if(object.isRange())
-                    {
+                    if (object.isRange()) {
                         imageTypeViewHolder.btn_range.setColorFilter(R.color.range_colors);
                         imageTypeViewHolder.btn_range.setImageResource(R.drawable.in_range);
-                    }
-                    else
-                    {
+                    } else {
                         imageTypeViewHolder.btn_range.setImageResource(R.drawable.out_range);
                     }
 
@@ -210,7 +207,7 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
 
                     Glide.with(mContext).load(object.getImage()).into(imageTypeViewHolder.post_image);
-                    if (object.getProfilepic()==null) {
+                    if (object.getProfilepic() == null) {
                         FirebaseFirestore.getInstance().collection("Users").document(object.getUuid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                             @Override
                             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -293,6 +290,7 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         ImageView btn_like;
         ImageView btn_range;
         String uid;
+        TextView txtCaption;
 
 
         public ImageTypeViewHolder(View itemView) {
@@ -305,6 +303,7 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             btn_like = itemView.findViewById(R.id.btn_like);
             txt_comments = itemView.findViewById(R.id.button_comment);
             btn_range = itemView.findViewById(R.id.button_range);
+            txtCaption = itemView.findViewById(R.id.txt_caption);
         }
 
     }

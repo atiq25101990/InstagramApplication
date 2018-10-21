@@ -8,16 +8,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.ArrayList;
+import com.bumptech.glide.Glide;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 import mobileprogramming.unimelb.com.instagramapplication.R;
 
 public class BluetoothDeviceAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     Context c;
-    ArrayList<String> devices;
+    ArrayList<HashMap<String, String>> devices;
 
-    public BluetoothDeviceAdapter(Context c, ArrayList<String> devices) {
+    public BluetoothDeviceAdapter(Context c, ArrayList<HashMap<String, String>> devices) {
         this.c = c;
         this.devices = devices;
     }
@@ -30,7 +34,8 @@ public class BluetoothDeviceAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        ((MyViewHolder) holder).device.setText(devices.get(position));
+        ((MyViewHolder) holder).device.setText(devices.get(position).get("username"));
+        Glide.with(holder.itemView.getContext()).load(devices.get(position).get("image")).into(((MyViewHolder) holder).background);
     }
 
 
@@ -43,11 +48,13 @@ public class BluetoothDeviceAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     public static class MyViewHolder extends RecyclerView.ViewHolder {
 
         public TextView device;
+        public CircleImageView background;
 
 
         public MyViewHolder(final View itemView) {
             super(itemView);
             device = itemView.findViewById(R.id.txt_device);
+            background = itemView.findViewById(R.id.background_bluetooth);
         }
 
     }

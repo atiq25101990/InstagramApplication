@@ -23,6 +23,7 @@ import ja.burhanrashid52.photoeditor.PhotoEditor;
 import ja.burhanrashid52.photoeditor.PhotoEditorView;
 import ja.burhanrashid52.photoeditor.PhotoFilter;
 import mobileprogramming.unimelb.com.instagramapplication.Share.NextActivity;
+import mobileprogramming.unimelb.com.instagramapplication.utils.CommonUtils;
 import mobileprogramming.unimelb.com.instagramapplication.utils.UniversalImageLoader;
 
 public class PhotoEditingActivity extends AppCompatActivity {
@@ -53,7 +54,7 @@ public class PhotoEditingActivity extends AppCompatActivity {
         type = intent.getStringExtra("type");
 
         assert type != null;
-        if(type.equals("inrange")){
+        if(type.equals("inRange")){
             inRange = intent.getStringArrayExtra("users");
         }
         setImage();
@@ -73,18 +74,21 @@ public class PhotoEditingActivity extends AppCompatActivity {
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                CommonUtils.showLoadingDialog(PhotoEditingActivity.this);
                 mPhotoEditor.saveAsBitmap(new OnSaveBitmap() {
                     @Override
                     public void onBitmapReady(Bitmap saveBitmap) {
-                        Intent intent = new Intent(PhotoEditingActivity.this, NextActivity.class);
+                        Intent intent = new Intent(PhotoEditingActivity.this, CropImageActivity.class);
                         ByteArrayOutputStream stream = new ByteArrayOutputStream();
                         saveBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
                         byte[] byteArray = stream.toByteArray();
                         intent.putExtra(getString(R.string.selected_bitmap), byteArray);
                         intent.putExtra("type", type);
-                        if(type.equals("inrange")){
+                        if(type.equals("inRange")){
                             intent.putExtra("users", inRange);
                         }
+
+                        CommonUtils.dismissProgressDialog();
                         startActivity(intent);
                     }
 
