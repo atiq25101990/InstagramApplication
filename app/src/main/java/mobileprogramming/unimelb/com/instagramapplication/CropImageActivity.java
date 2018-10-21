@@ -47,7 +47,7 @@ public class CropImageActivity extends AppCompatActivity {
         Intent thisIntent = getIntent();
         type = thisIntent.getStringExtra("type");
 
-        if(type.equals("inRange")){
+        if(type.equals("inrange")){
             inRange = thisIntent.getStringArrayExtra("users");
         }
 
@@ -75,7 +75,7 @@ public class CropImageActivity extends AppCompatActivity {
                 byte[] byteArray = stream.toByteArray();
                 intent.putExtra(getString(R.string.selected_bitmap), byteArray);
                 intent.putExtra("type", type);
-                if(type.equals("inRange")){
+                if(type.equals("inrange")){
                     intent.putExtra("users", inRange);
                 }
                 CommonUtils.dismissProgressDialog();

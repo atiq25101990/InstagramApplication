@@ -116,7 +116,7 @@ public class FriendsNearby extends AppCompatActivity {
                 String[] inrange = new String[1];
                 inrange[0] = devices.get(position).get("uid");
                 Intent intent = new Intent(FriendsNearby.this, ShareActivity.class);
-                intent.putExtra("type", "inRange");
+                intent.putExtra("type", "inrange");
                 intent.putExtra("users", inrange);
                 startActivity(intent);
 

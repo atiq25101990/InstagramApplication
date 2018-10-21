@@ -107,7 +107,6 @@ public class FirebaseMethods {
                                     addPhotoToDatabase(caption, firebaseUrl.toString());
                                     break;
                                 case "inrange":
-                                    ArrayList<String> inrangeUsers = new ArrayList<>();
                                     addInRangeToDatabase(caption, firebaseUrl, inRange);
                             }
                         }
