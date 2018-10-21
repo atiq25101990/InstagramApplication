@@ -3,6 +3,7 @@ package mobileprogramming.unimelb.com.instagramapplication.Share;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
@@ -10,6 +11,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.widget.Toast;
 
 import mobileprogramming.unimelb.com.instagramapplication.R;
 import mobileprogramming.unimelb.com.instagramapplication.utils.Permissions;
@@ -90,6 +92,20 @@ public class ShareActivity extends AppCompatActivity {
 
     }
 
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode){
+            case VERIFY_PERMISSIONS_REQUEST:
+                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    setupViewPager();
+                } else {
+                    Toast.makeText(ShareActivity.this, "Permission Not Granted!", Toast.LENGTH_LONG).show();
+                    finish();
+                }
+                return;
+        }
+    }
 
     //Check an array of permissions
     public boolean checkPermissionsArray(String[] permissions) {

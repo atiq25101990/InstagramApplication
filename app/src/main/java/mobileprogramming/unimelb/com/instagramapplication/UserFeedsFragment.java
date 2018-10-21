@@ -28,8 +28,11 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -328,7 +331,16 @@ public class UserFeedsFragment extends Fragment {
                             m.setPostid(document.getId());
                             m.setImage(document.getData().get("image").toString());
                             m.setUuid(document.getData().get("uid").toString());
-                            m.setDate(document.getData().get("date").toString());
+
+                            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+                            SimpleDateFormat formatterOut = new SimpleDateFormat("dd MMM yyyy");
+                            try {
+                                Date date = formatter.parse(String.valueOf(document.get("date")));
+                                m.setDate(formatterOut.format(date));
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+
                             m.setCaption(document.getString("caption"));
                             Log.d(TAG, document.getData().get("date").toString());
                             try {

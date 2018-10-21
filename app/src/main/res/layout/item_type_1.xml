@@ -43,7 +43,6 @@
                 android:id="@+id/txt_date"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="10 oct 2018"
                 android:textSize="12sp" />
 
         </LinearLayout>

@@ -20,7 +20,10 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 
 import butterknife.BindView;
@@ -123,7 +126,18 @@ public class PostActivity extends AppCompatActivity {
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                     postid = document.getId();
-                    date = String.valueOf(document.get("date"));
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+                    // parsing date
+                    Date dateObject = null;
+                    try {
+                        dateObject = sdf.parse((String) document.get("date"));
+                        SimpleDateFormat sdf2 = new SimpleDateFormat("dd MMM yyyy");
+
+                        date = sdf2.format(dateObject);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+
                     location = document.getString("location");
                     uuid = document.getString("uid");
                 }

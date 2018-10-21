@@ -27,6 +27,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -48,6 +49,8 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private OnItemClickListener onItemClickListener;
     private ArrayList<Model> dataSet;
     private boolean fabStateVolume = false;
+    Calendar cal = Calendar.getInstance();
+    SimpleDateFormat sdf;
 
     public FeedAdapter(AppCompatActivity context, ArrayList<Model> data) {
         this.dataSet = data;
@@ -141,6 +144,7 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     imageTypeViewHolder.txt_username.setText(String.valueOf(object.getUsername()));
                     imageTypeViewHolder.uid = object.getUuid();
                     imageTypeViewHolder.txtCaption.setText(object.getCaption());
+//                    imageTypeViewHolder.txt_date.setText();
 
                     if (object.isRange()) {
                         imageTypeViewHolder.btn_range.setColorFilter(R.color.range_colors);
@@ -149,15 +153,18 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                         imageTypeViewHolder.btn_range.setImageResource(R.drawable.out_range);
                     }
 
-                    SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM dd HH:mm:ss Z yyyy");
-                    SimpleDateFormat formatterOut = new SimpleDateFormat("HH:mm:ss dd MMM yyyy");
+                    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+                    SimpleDateFormat formatterOut = new SimpleDateFormat("dd MMM yyyy");
+                    String dateString;
                     try {
                         Date date = formatter.parse(object.getDate());
-                        imageTypeViewHolder.txt_date.setText(formatterOut.format(date));
+                         dateString = formatterOut.format(date);
                     } catch (ParseException e) {
                         e.printStackTrace();
+                        dateString = object.getDate();
                     }
 
+                    imageTypeViewHolder.txt_date.setText(dateString);
                     imageTypeViewHolder.txt_username.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {

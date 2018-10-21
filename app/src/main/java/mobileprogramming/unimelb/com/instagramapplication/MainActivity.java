@@ -25,6 +25,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.net.NetworkInterface;
+import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -50,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
     private String user_id;
     private static final String TAG = "MainActivity";
     private String MAC;
+    SimpleDateFormat sdf;
+
 
 
     @Override
