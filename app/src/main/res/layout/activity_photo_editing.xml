@@ -52,21 +52,21 @@
             android:layout_weight="1"
             android:id="@+id/sepiaFilter"
             android:layout_height="64dp"
-            android:src="@drawable/sepia_filter"/>
+            android:src="@drawable/sepia"/>
 
         <ImageButton
             android:layout_width="0dp"
             android:layout_weight="1"
             android:id="@+id/bwFilter"
             android:layout_height="64dp"
-            android:src="@drawable/bw_filter"/>
+            android:src="@drawable/bw"/>
 
         <ImageButton
             android:layout_width="0dp"
             android:layout_weight="1"
             android:id="@+id/vignetteFilter"
             android:layout_height="64dp"
-            android:src="@drawable/vignette_filter"/>
+            android:src="@drawable/vignette"/>
     </LinearLayout>
 
     <Button
