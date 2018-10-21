@@ -146,6 +146,7 @@ public class ProfileFragment extends Fragment {
                     if (document.exists()) {
                         profileUser.put("username", document.getString("username"));
                         profileUser.put("imageURL", document.getString("image"));
+                        profileUser.put("name", document.getString("name"));
                         profileUser.put("bio", document.getString("bio"));
 
                         profileUserName.setText(profileUser.get("username"));

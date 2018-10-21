@@ -17,17 +17,20 @@
     <com.theartofdev.edmodo.cropper.CropImageView
         android:id="@+id/pictureCrop"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="9" />
+        android:layout_height="370dp" />
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
     <Button
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="?attr/actionBarSize"
         android:id="@+id/submit_button"
+        android:layout_alignParentBottom="true"
         android:text="Next"
         android:padding="16dp"
         android:background="@color/colorPrimaryDark"
-        android:elevation="8dp"
-        android:layout_weight="1"/>
+        android:elevation="8dp"/>
+    </RelativeLayout>
 
 </LinearLayout>
